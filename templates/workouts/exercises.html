@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html lang="en">
+<head><meta charset="UTF-8"><title>Exercises — Gym AI</title></head>
+<body>
+<header>GYM AI</header>
+<main>
+  <h1>Exercise Library</h1>
+  <p>{{ exercises|length }} exercises</p>
+  {% for exercise in exercises %}
+  <div>
+    <strong>{{ exercise.name }}</strong>
+    <span>{{ exercise.muscle_group }} · {{ exercise.get_equipment_display }}</span>
+    <span>{{ exercise.default_sets }} × {{ exercise.default_min_reps }}–{{ exercise.default_max_reps }}</span>
+  </div>
+  {% empty %}
+  <p>No exercises loaded yet.</p>
+  {% endfor %}
+</main>
+</body>
+</html>

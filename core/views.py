@@ -31,4 +31,4 @@ def pin(request):
 
 
 def dashboard(request):
-    return HttpResponse('dashboard stub')
+    return render(request, 'core/dashboard.html')
