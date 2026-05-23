@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Enter PIN — Gym AI</title>
+</head>
+<body>
+<h1>Enter PIN</h1>
+{% if error %}<p>{{ error }}</p>{% endif %}
+<form method="post" id="pin-form">
+  {% csrf_token %}
+  <input type="hidden" name="pin" id="pin-input" value="">
+  <div>
+    <button type="button" onclick="pinPress('1')">1</button>
+    <button type="button" onclick="pinPress('2')">2</button>
+    <button type="button" onclick="pinPress('3')">3</button>
+    <button type="button" onclick="pinPress('4')">4</button>
+    <button type="button" onclick="pinPress('5')">5</button>
+    <button type="button" onclick="pinPress('6')">6</button>
+    <button type="button" onclick="pinPress('7')">7</button>
+    <button type="button" onclick="pinPress('8')">8</button>
+    <button type="button" onclick="pinPress('9')">9</button>
+    <button type="button" onclick="pinPress('0')">0</button>
+    <button type="button" onclick="pinDelete()">⌫</button>
+  </div>
+</form>
+<script>
+let currentPin = '';
+function pinPress(d) {
+  if (currentPin.length >= 4) return;
+  currentPin += d;
+  document.getElementById('pin-input').value = currentPin;
+  if (currentPin.length === 4) document.getElementById('pin-form').submit();
+}
+function pinDelete() {
+  currentPin = currentPin.slice(0, -1);
+  document.getElementById('pin-input').value = currentPin;
+}
+</script>
+</body>
+</html>
