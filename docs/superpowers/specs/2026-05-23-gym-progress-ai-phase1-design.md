@@ -91,7 +91,7 @@ GYM_PIN_HASH=replace_with_bcrypt_hashed_pin
 GYM_SESSION_TIMEOUT_HOURS=24
 ```
 
-The PIN hash is generated with bcrypt before first run. The secret path controls all URL prefixes.
+The PIN hash is generated with bcrypt before first run using a Django management command (`python manage.py set_pin`), which prompts for a PIN and writes the bcrypt hash to `.env`. The secret path controls all URL prefixes.
 
 ---
 
@@ -180,7 +180,7 @@ class ExerciseAlias(models.Model):
 
 ### Seed Data
 
-`workouts/fixtures/exercises.json` contains ~35 exercises across all 5 categories with their default aliases. Loaded via `python manage.py loaddata exercises`.
+`workouts/fixtures/exercises.json` contains ~39 fixture records across all 5 categories (some exercises like Lateral Raise, Hammer Curl, and Barbell Curl appear in multiple categories intentionally). Approximately 30 unique exercise names. Loaded via `python manage.py loaddata exercises`.
 
 **Categories covered:**
 - **Push:** Bench Press, Incline DB Press, DB Shoulder Press, Machine Chest Press, Cable Fly, Lateral Raise, Tricep Pushdown, Overhead Tricep Extension
@@ -225,7 +225,7 @@ class ExerciseAlias(models.Model):
 
 ### PIN Screen Layout
 
-Number-pad style (not a text input): 4 dots showing entry progress, 3×4 grid of digit keys, backspace key. No keyboard shown — mobile-native feel.
+Number-pad style (not a text input): 4 dots showing entry progress, 3×4 grid of digit keys, backspace key. JavaScript fills a hidden `<input>` as the user taps digit buttons; the form submits normally to Django. No system keyboard shown — mobile-native feel.
 
 ### Dashboard Layout (Layout C — Hero + FAB)
 
