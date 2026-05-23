@@ -1,0 +1,55 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="theme-color" content="#070A0F">
+  <title>{% block title %}Gym AI{% endblock %}</title>
+  <link rel="stylesheet" href="{% static 'css/app.css' %}">
+</head>
+<body>
+<div class="app-wrapper">
+
+  {% block header %}
+  <header class="app-header">
+    <span class="app-logo">GYM AI</span>
+    <span class="header-dot"></span>
+  </header>
+  {% endblock %}
+
+  <main class="app-main">
+    {% block content %}{% endblock %}
+  </main>
+
+  {% block bottom_nav %}
+  <nav class="bottom-nav">
+    <a href="{% url 'gym_dashboard' %}"
+       class="nav-item {% if request.resolver_match.url_name == 'gym_dashboard' %}active{% endif %}">
+      <span class="nav-icon">⊞</span>
+      <span>Home</span>
+    </a>
+    <a href="#" class="nav-item">
+      <span class="nav-icon">✎</span>
+      <span>Log</span>
+    </a>
+    <a href="#" class="nav-item">
+      <span class="nav-icon">◎</span>
+      <span>Coach</span>
+    </a>
+    <a href="#" class="nav-item">
+      <span class="nav-icon">↗</span>
+      <span>Progress</span>
+    </a>
+    <a href="{% url 'gym_exercises' %}"
+       class="nav-item {% if request.resolver_match.url_name == 'gym_exercises' %}active{% endif %}">
+      <span class="nav-icon">☰</span>
+      <span>Exercises</span>
+    </a>
+  </nav>
+  {% endblock %}
+
+</div>
+{% block scripts %}{% endblock %}
+</body>
+</html>
