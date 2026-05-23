@@ -1,0 +1,354 @@
+/* ── Variables ─────────────────────────────────────────────────── */
+:root {
+  --bg:          #070A0F;
+  --card:        #111827;
+  --card2:       #1F2937;
+  --border:      #374151;
+  --text:        #F9FAFB;
+  --text-sec:    #9CA3AF;
+  --text-muted:  #6B7280;
+  --accent:      #22C55E;
+  --accent-dim:  rgba(34,197,94,.15);
+  --danger:      #EF4444;
+  --warning:     #F59E0B;
+  --radius-card: 14px;
+  --radius-btn:  10px;
+  --nav-height:  58px;
+}
+
+/* ── Reset ─────────────────────────────────────────────────────── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+html, body {
+  height: 100%;
+  background: var(--bg);
+  color: var(--text);
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  font-size: 16px;
+  -webkit-font-smoothing: antialiased;
+}
+
+a { color: inherit; text-decoration: none; }
+button { cursor: pointer; font-family: inherit; }
+
+/* ── App wrapper ────────────────────────────────────────────────── */
+.app-wrapper {
+  display: flex;
+  flex-direction: column;
+  min-height: 100dvh;
+  max-width: 480px;
+  margin: 0 auto;
+  position: relative;
+}
+
+/* ── Header ─────────────────────────────────────────────────────── */
+.app-header {
+  background: var(--card);
+  border-bottom: 1px solid var(--border);
+  padding: 14px 20px 12px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-shrink: 0;
+}
+
+.app-logo {
+  font-size: 15px;
+  font-weight: 800;
+  letter-spacing: 1.5px;
+  color: var(--accent);
+}
+
+.header-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--accent);
+}
+
+/* ── Main content ───────────────────────────────────────────────── */
+.app-main {
+  flex: 1;
+  padding: 16px 16px calc(var(--nav-height) + 16px);
+  overflow-y: auto;
+}
+
+/* ── Bottom navigation ──────────────────────────────────────────── */
+.bottom-nav {
+  position: fixed;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 100%;
+  max-width: 480px;
+  height: var(--nav-height);
+  background: var(--card);
+  border-top: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+}
+
+.nav-item {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  padding: 6px 0;
+  font-size: 10px;
+  color: var(--text-muted);
+  transition: color .15s;
+}
+
+.nav-item.active,
+.nav-item:hover { color: var(--accent); }
+
+.nav-icon {
+  font-size: 18px;
+  line-height: 1;
+}
+
+/* ── Cards ──────────────────────────────────────────────────────── */
+.gym-card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-card);
+  padding: 14px 16px;
+  margin-bottom: 12px;
+}
+
+.section-label {
+  font-size: 10px;
+  font-weight: 600;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  margin: 16px 0 8px;
+}
+
+.empty-state {
+  font-size: 13px;
+  color: var(--text-sec);
+  text-align: center;
+  padding: 8px 0;
+}
+
+/* ── Hero card (dashboard) ──────────────────────────────────────── */
+.hero-card {
+  background: #0D1117;
+  border: 1px solid var(--accent-dim);
+  border-radius: var(--radius-card);
+  padding: 20px 18px;
+  margin-bottom: 16px;
+  position: relative;
+}
+
+.hero-label {
+  font-size: 10px;
+  font-weight: 600;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  margin-bottom: 6px;
+}
+
+.hero-day {
+  font-size: 28px;
+  font-weight: 800;
+  color: var(--accent);
+  line-height: 1;
+  margin-bottom: 6px;
+}
+
+.hero-sub {
+  font-size: 12px;
+  color: var(--text-sec);
+}
+
+.hero-badge {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  background: var(--accent-dim);
+  color: var(--accent);
+  font-size: 10px;
+  font-weight: 600;
+  padding: 3px 10px;
+  border-radius: 20px;
+}
+
+/* ── Floating action button ─────────────────────────────────────── */
+.fab {
+  position: fixed;
+  bottom: calc(var(--nav-height) + 16px);
+  right: max(16px, calc(50vw - 224px));
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  background: var(--accent);
+  color: var(--bg);
+  font-size: 28px;
+  font-weight: 700;
+  line-height: 1;
+  border: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 16px rgba(34,197,94,.4);
+  z-index: 100;
+}
+
+/* ── Buttons ────────────────────────────────────────────────────── */
+.btn {
+  display: block;
+  width: 100%;
+  padding: 13px;
+  border-radius: var(--radius-btn);
+  font-size: 15px;
+  font-weight: 700;
+  border: none;
+  text-align: center;
+}
+
+.btn-primary { background: var(--accent); color: var(--bg); }
+.btn-secondary { background: var(--card2); color: var(--text); border: 1px solid var(--border); }
+.btn-danger { background: transparent; color: var(--danger); border: 1px solid var(--danger); }
+
+/* ── Form inputs ────────────────────────────────────────────────── */
+.form-input {
+  width: 100%;
+  background: var(--card2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-btn);
+  padding: 12px 14px;
+  color: var(--text);
+  font-size: 15px;
+  outline: none;
+  transition: border-color .15s;
+}
+
+.form-input:focus { border-color: var(--accent); }
+
+/* ── PIN screen ─────────────────────────────────────────────────── */
+.pin-screen {
+  min-height: 100dvh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 32px 24px;
+  background: var(--bg);
+}
+
+.pin-icon {
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  background: var(--card2);
+  border: 2px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 28px;
+  margin-bottom: 20px;
+}
+
+.pin-title {
+  font-size: 22px;
+  font-weight: 700;
+  margin-bottom: 6px;
+}
+
+.pin-sub {
+  font-size: 13px;
+  color: var(--text-sec);
+  margin-bottom: 28px;
+}
+
+.pin-error {
+  color: var(--danger);
+  font-size: 13px;
+  margin-bottom: 16px;
+}
+
+.pin-dots {
+  display: flex;
+  gap: 14px;
+  margin-bottom: 32px;
+}
+
+.pin-dot {
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  border: 2px solid var(--border);
+  background: transparent;
+  transition: background .1s, border-color .1s;
+}
+
+.pin-dot.filled {
+  background: var(--accent);
+  border-color: var(--accent);
+}
+
+.pin-pad {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+  width: 100%;
+  max-width: 280px;
+}
+
+.pin-key {
+  height: 60px;
+  background: var(--card2);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  font-size: 20px;
+  font-weight: 600;
+  color: var(--text);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background .1s;
+}
+
+.pin-key:active { background: var(--border); }
+.pin-key--del { font-size: 16px; color: var(--text-sec); }
+.pin-key--empty { background: transparent; border: none; pointer-events: none; }
+
+/* ── Page header ────────────────────────────────────────────────── */
+.page-header { margin-bottom: 16px; }
+.page-title { font-size: 20px; font-weight: 700; }
+.page-sub { font-size: 12px; color: var(--text-sec); margin-top: 2px; }
+
+/* ── Exercise list ──────────────────────────────────────────────── */
+.exercise-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 16px;
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  margin-bottom: 8px;
+}
+
+.exercise-name {
+  display: block;
+  font-size: 14px;
+  font-weight: 600;
+  margin-bottom: 2px;
+}
+
+.exercise-meta {
+  font-size: 11px;
+  color: var(--text-sec);
+}
+
+.exercise-sets {
+  font-size: 12px;
+  color: var(--accent);
+  font-weight: 600;
+  white-space: nowrap;
+}
