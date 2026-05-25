@@ -56,3 +56,44 @@ class ExerciseAlias(models.Model):
 
     def __str__(self):
         return f'{self.alias} → {self.exercise.name}'
+
+
+class WorkoutSession(models.Model):
+    STATUS_CHOICES = [('active', 'Active'), ('complete', 'Complete')]
+
+    name         = models.CharField(max_length=100)
+    status       = models.CharField(max_length=10, choices=STATUS_CHOICES, default='active')
+    started_at   = models.DateTimeField(auto_now_add=True)
+    completed_at = models.DateTimeField(null=True, blank=True)
+
+    class Meta:
+        ordering = ['-started_at']
+
+    def __str__(self):
+        return f'{self.name} ({self.started_at:%Y-%m-%d})'
+
+
+class WorkoutExercise(models.Model):
+    session  = models.ForeignKey(WorkoutSession, on_delete=models.CASCADE, related_name='workout_exercises')
+    exercise = models.ForeignKey(Exercise, on_delete=models.PROTECT, related_name='workout_exercises')
+    order    = models.PositiveIntegerField(default=0)
+
+    class Meta:
+        ordering = ['order']
+
+    def __str__(self):
+        return f'{self.session.name} — {self.exercise.name}'
+
+
+class WorkoutSet(models.Model):
+    workout_exercise = models.ForeignKey(WorkoutExercise, on_delete=models.CASCADE, related_name='sets')
+    set_number       = models.PositiveIntegerField()
+    weight_kg        = models.DecimalField(max_digits=5, decimal_places=1)
+    reps             = models.PositiveIntegerField()
+    created_at       = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ['set_number']
+
+    def __str__(self):
+        return f'Set {self.set_number}: {self.weight_kg}kg × {self.reps}'
