@@ -114,9 +114,9 @@ def nl_parse(request, session_id):
     text = request.POST.get('text', '').strip()
     if not text:
         return JsonResponse({'error': 'No text provided'}, status=422)
-    exercises = Exercise.objects.filter(is_active=True)
+    active_exercises = Exercise.objects.filter(is_active=True)
     try:
-        result = parse(text, exercises)
+        result = parse(text, active_exercises)
         return JsonResponse(result)
     except NLParseError as e:
         return JsonResponse(
@@ -135,7 +135,10 @@ def nl_confirm(request, session_id):
     except (json.JSONDecodeError, KeyError, TypeError):
         return redirect('gym_active_session', session_id=session.id)
     for ex_data in exercises_data:
-        exercise = Exercise.objects.filter(name__iexact=ex_data['name'], is_active=True).first()
+        exercise_name = ex_data.get('name', '')
+        if not exercise_name:
+            continue
+        exercise = Exercise.objects.filter(name__iexact=exercise_name, is_active=True).first()
         if exercise is None:
             continue
         we, _ = WorkoutExercise.objects.get_or_create(

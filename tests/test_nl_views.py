@@ -113,3 +113,24 @@ def test_nl_confirm_redirects(verified_client):
     )
     assert response.status_code == 302
     assert str(session.id) in response['Location']
+
+
+@pytest.mark.django_db
+def test_nl_confirm_invalid_session_404(verified_client):
+    response = verified_client.post(
+        reverse('gym_nl_confirm', args=[9999]),
+        {'parsed_json': PARSED_JSON},
+    )
+    assert response.status_code == 404
+
+
+@pytest.mark.django_db
+def test_nl_confirm_complete_session_404(verified_client):
+    session = WorkoutSession.objects.create(
+        name='Done', status='complete', completed_at=timezone.now()
+    )
+    response = verified_client.post(
+        reverse('gym_nl_confirm', args=[session.id]),
+        {'parsed_json': PARSED_JSON},
+    )
+    assert response.status_code == 404
