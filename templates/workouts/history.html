@@ -1,0 +1,34 @@
+{% extends 'base.html' %}
+{% block title %}History — Gym AI{% endblock %}
+
+{% block content %}
+<div class="page-header">
+  <h1 class="page-title">History</h1>
+</div>
+
+{% for session in sessions %}
+{% with exlist=session.workout_exercises.all %}
+<a href="{% url 'gym_session_detail' session.id %}" class="history-card">
+  <div class="hc-top">
+    <div class="hc-name">{{ session.name }}</div>
+    <div class="hc-date">{{ session.completed_at|timesince }} ago</div>
+  </div>
+  <div class="hc-meta">{{ exlist|length }} exercise{{ exlist|length|pluralize }}</div>
+  {% if exlist %}
+  <div class="hc-exercises">
+    {% for we in exlist|slice:":3" %}
+    <span class="hc-ex">
+      {{ we.exercise.name }}{% if we.max_weight %} · <span class="hc-ex-weight">{{ we.max_weight|floatformat:"-1" }}kg</span>{% endif %}
+    </span>
+    {% endfor %}
+    {% if exlist|length > 3 %}
+    <span class="hc-more">+{{ exlist|length|add:"-3" }} more</span>
+    {% endif %}
+  </div>
+  {% endif %}
+</a>
+{% endwith %}
+{% empty %}
+<p class="empty-state">No workouts logged yet — tap + to start</p>
+{% endfor %}
+{% endblock %}

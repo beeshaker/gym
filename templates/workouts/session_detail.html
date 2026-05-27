@@ -1,0 +1,27 @@
+{% extends 'base.html' %}
+{% block title %}{{ session.name }} — Gym AI{% endblock %}
+
+{% block content %}
+<div class="detail-hero">
+  <div class="detail-name">{{ session.name }}</div>
+  <div class="detail-meta">
+    {{ session.started_at|date:"D j M Y" }}{% if session.completed_at %} · {{ session.started_at|timesince:session.completed_at }}{% endif %}
+  </div>
+</div>
+
+{% for we in workout_exercises %}
+<div class="section-label">{{ we.exercise.name }}</div>
+<div class="gym-card">
+  {% for set in we.sets.all %}
+  <div class="detail-set-row">
+    <span class="detail-set-num">Set {{ set.set_number }}</span>
+    <span class="detail-set-val">{{ set.weight_kg|floatformat:"-1" }} kg × {{ set.reps }} reps</span>
+  </div>
+  {% empty %}
+  <p class="empty-state">No sets logged</p>
+  {% endfor %}
+</div>
+{% empty %}
+<p class="empty-state">No exercises in this session</p>
+{% endfor %}
+{% endblock %}
