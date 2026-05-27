@@ -1,0 +1,102 @@
+{% extends 'base.html' %}
+{% block title %}{{ session.name }} — Gym AI{% endblock %}
+
+{% block content %}
+<div class="session-title">{{ session.name }}</div>
+
+{% for we in workout_exercises %}
+<div class="we-card">
+  <div class="we-name">{{ we.exercise.name }}</div>
+  <div class="we-meta">{{ we.exercise.get_category_display }} · {{ we.exercise.get_equipment_display }}</div>
+
+  {% with sets=we.sets.all %}
+  {% if sets %}
+  <div class="set-table-header">
+    <span>Set</span><span style="text-align:center">kg</span><span></span>
+    <span style="text-align:center">Reps</span><span></span><span></span>
+  </div>
+  {% for set in sets %}
+  <div class="set-row">
+    <span class="set-num">{{ set.set_number }}</span>
+    <span class="set-val">{{ set.weight_kg|floatformat:"-1" }}</span>
+    <span class="set-x">×</span>
+    <span class="set-val">{{ set.reps }}</span>
+    <span></span>
+    <form method="post" action="{% url 'gym_delete_set' session.id we.id set.id %}">
+      {% csrf_token %}
+      <button type="submit" class="set-delete" aria-label="Delete">×</button>
+    </form>
+  </div>
+  {% endfor %}
+  {% endif %}
+
+  <form method="post" action="{% url 'gym_add_set' session.id we.id %}" class="set-row" style="margin-top:8px">
+    {% csrf_token %}
+    <span class="set-num">{{ sets|length|add:1 }}</span>
+    <input type="number" name="weight_kg" class="set-input" step="0.5" min="0"
+           placeholder="kg" required inputmode="decimal">
+    <span class="set-x">×</span>
+    <input type="number" name="reps" class="set-input" min="1"
+           placeholder="reps" required inputmode="numeric">
+    <button type="submit" class="set-check">✓</button>
+    <span></span>
+  </form>
+  {% endwith %}
+</div>
+{% empty %}
+<p class="empty-state" style="margin-bottom:16px">No exercises yet — add one below</p>
+{% endfor %}
+
+<button type="button" class="btn btn-secondary" style="margin-bottom:12px" onclick="openPicker()">
+  + Add Exercise
+</button>
+
+<form method="post" action="{% url 'gym_finish_session' session.id %}">
+  {% csrf_token %}
+  <button type="submit" class="btn btn-danger">Finish Workout</button>
+</form>
+
+<!-- Exercise picker -->
+<div class="picker-overlay" id="picker-overlay">
+  <div class="picker-sheet">
+    <div class="picker-header">
+      <input type="text" class="picker-search" id="picker-search" placeholder="Search exercises...">
+      <button type="button" class="picker-close" onclick="closePicker()">×</button>
+    </div>
+    <div class="picker-list" id="picker-list">
+      {% for ex in all_exercises %}
+      <form method="post" action="{% url 'gym_add_exercise' session.id %}">
+        {% csrf_token %}
+        <input type="hidden" name="exercise_id" value="{{ ex.id }}">
+        <button type="submit" class="picker-item">
+          <span class="picker-item-name">{{ ex.name }}</span>
+          <span class="picker-item-meta">{{ ex.get_category_display }} · {{ ex.get_equipment_display }}</span>
+        </button>
+      </form>
+      {% endfor %}
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+function openPicker() {
+  document.getElementById('picker-overlay').classList.add('open');
+  document.getElementById('picker-search').focus();
+}
+function closePicker() {
+  document.getElementById('picker-overlay').classList.remove('open');
+}
+document.getElementById('picker-search').addEventListener('input', function () {
+  const q = this.value.toLowerCase();
+  document.querySelectorAll('#picker-list form').forEach(function (form) {
+    const name = form.querySelector('.picker-item-name').textContent.toLowerCase();
+    form.style.display = name.includes(q) ? '' : 'none';
+  });
+});
+document.getElementById('picker-overlay').addEventListener('click', function (e) {
+  if (e.target === this) closePicker();
+});
+</script>
+{% endblock %}
