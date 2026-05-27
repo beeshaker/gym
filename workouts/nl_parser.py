@@ -125,6 +125,8 @@ def _call_ollama(text: str, exercises) -> dict:
         for s in ex.get('sets', []):
             if 'weight_kg' in s:
                 s['weight_kg'] = float(s['weight_kg'])
+            if 'reps' in s:
+                s['reps'] = int(s['reps'])
     data['source'] = 'ollama'
     return data
 
