@@ -1,7 +1,104 @@
-from django.shortcuts import render
-from .models import Exercise
+from django.db.models import Max, Prefetch
+from django.shortcuts import get_object_or_404, redirect, render
+from django.utils import timezone
+from django.views.decorators.http import require_http_methods
+
+from .models import Exercise, WorkoutExercise, WorkoutSession, WorkoutSet
 
 
 def exercises(request):
     exercise_list = Exercise.objects.filter(is_active=True).order_by('category', 'name')
     return render(request, 'workouts/exercises.html', {'exercises': exercise_list})
+
+
+def log_home(request):
+    active = WorkoutSession.objects.filter(status='active').first()
+    if active:
+        return redirect('gym_active_session', session_id=active.id)
+    return render(request, 'workouts/log_home.html')
+
+
+@require_http_methods(['POST'])
+def start_session(request):
+    name = request.POST.get('name', '').strip()
+    if not name:
+        return render(request, 'workouts/log_home.html', {'error': 'Please enter a session name.'})
+    session = WorkoutSession.objects.create(name=name)
+    return redirect('gym_active_session', session_id=session.id)
+
+
+def active_session(request, session_id):
+    session = get_object_or_404(WorkoutSession, id=session_id)
+    if session.status == 'complete':
+        return redirect('gym_session_detail', session_id=session.id)
+    workout_exercises = session.workout_exercises.select_related('exercise').prefetch_related('sets')
+    all_exercises = Exercise.objects.filter(is_active=True).order_by('category', 'name')
+    return render(request, 'workouts/active_session.html', {
+        'session': session,
+        'workout_exercises': workout_exercises,
+        'all_exercises': all_exercises,
+    })
+
+
+@require_http_methods(['POST'])
+def add_exercise(request, session_id):
+    session = get_object_or_404(WorkoutSession, id=session_id, status='active')
+    exercise = get_object_or_404(Exercise, id=request.POST.get('exercise_id'))
+    order = session.workout_exercises.count() + 1
+    WorkoutExercise.objects.create(session=session, exercise=exercise, order=order)
+    return redirect('gym_active_session', session_id=session.id)
+
+
+@require_http_methods(['POST'])
+def add_set(request, session_id, we_id):
+    session = get_object_or_404(WorkoutSession, id=session_id, status='active')
+    we = get_object_or_404(WorkoutExercise, id=we_id, session=session)
+    try:
+        weight_kg = float(request.POST.get('weight_kg', ''))
+        reps = int(request.POST.get('reps', ''))
+        if weight_kg < 0 or reps < 1:
+            raise ValueError
+    except (ValueError, TypeError):
+        return redirect('gym_active_session', session_id=session.id)
+    set_number = we.sets.count() + 1
+    WorkoutSet.objects.create(workout_exercise=we, set_number=set_number, weight_kg=weight_kg, reps=reps)
+    return redirect('gym_active_session', session_id=session.id)
+
+
+@require_http_methods(['POST'])
+def delete_set(request, session_id, we_id, set_id):
+    ws = get_object_or_404(
+        WorkoutSet, id=set_id,
+        workout_exercise__id=we_id,
+        workout_exercise__session__id=session_id,
+    )
+    ws.delete()
+    return redirect('gym_active_session', session_id=session_id)
+
+
+@require_http_methods(['POST'])
+def finish_session(request, session_id):
+    session = get_object_or_404(WorkoutSession, id=session_id, status='active')
+    session.status = 'complete'
+    session.completed_at = timezone.now()
+    session.save()
+    return redirect('gym_history')
+
+
+def history(request):
+    exercises_qs = WorkoutExercise.objects.select_related('exercise').annotate(
+        max_weight=Max('sets__weight_kg')
+    ).order_by('order')
+    sessions = WorkoutSession.objects.filter(status='complete').prefetch_related(
+        Prefetch('workout_exercises', queryset=exercises_qs)
+    )
+    return render(request, 'workouts/history.html', {'sessions': sessions})
+
+
+def session_detail(request, session_id):
+    session = get_object_or_404(WorkoutSession, id=session_id)
+    workout_exercises = session.workout_exercises.select_related('exercise').prefetch_related('sets')
+    return render(request, 'workouts/session_detail.html', {
+        'session': session,
+        'workout_exercises': workout_exercises,
+    })
