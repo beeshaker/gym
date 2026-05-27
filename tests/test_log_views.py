@@ -135,3 +135,22 @@ def test_delete_set_removes_set(verified_client):
     response = verified_client.post(reverse('gym_delete_set', args=[session.id, we.id, ws.id]))
     assert response.status_code == 302
     assert not WorkoutSet.objects.filter(id=ws.id).exists()
+
+
+# ── finish_session ────────────────────────────────────────────────
+
+@pytest.mark.django_db
+def test_finish_session_marks_complete(verified_client):
+    session = make_session()
+    response = verified_client.post(reverse('gym_finish_session', args=[session.id]))
+    session.refresh_from_db()
+    assert session.status == 'complete'
+    assert session.completed_at is not None
+    assert response.status_code == 302
+
+
+@pytest.mark.django_db
+def test_finish_session_redirects_to_history(verified_client):
+    session = make_session()
+    response = verified_client.post(reverse('gym_finish_session', args=[session.id]))
+    assert reverse('gym_history') in response['Location']
