@@ -1,9 +1,13 @@
+import json
+
 from django.db.models import Max, Prefetch
+from django.http import JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.utils import timezone
 from django.views.decorators.http import require_http_methods
 
 from .models import Exercise, WorkoutExercise, WorkoutSession, WorkoutSet
+from .nl_parser import NLParseError, parse
 
 
 def exercises(request):
@@ -102,3 +106,49 @@ def session_detail(request, session_id):
         'session': session,
         'workout_exercises': workout_exercises,
     })
+
+
+@require_http_methods(['POST'])
+def nl_parse(request, session_id):
+    session = get_object_or_404(WorkoutSession, id=session_id, status='active')
+    text = request.POST.get('text', '').strip()
+    if not text:
+        return JsonResponse({'error': 'No text provided'}, status=422)
+    exercises = Exercise.objects.filter(is_active=True)
+    try:
+        result = parse(text, exercises)
+        return JsonResponse(result)
+    except NLParseError as e:
+        return JsonResponse(
+            {'error': str(e) or 'Could not parse — try rephrasing or use the exercise picker'},
+            status=422,
+        )
+
+
+@require_http_methods(['POST'])
+def nl_confirm(request, session_id):
+    session = get_object_or_404(WorkoutSession, id=session_id, status='active')
+    raw = request.POST.get('parsed_json', '')
+    try:
+        data = json.loads(raw)
+        exercises_data = data['exercises']
+    except (json.JSONDecodeError, KeyError, TypeError):
+        return redirect('gym_active_session', session_id=session.id)
+    for ex_data in exercises_data:
+        exercise = Exercise.objects.filter(name__iexact=ex_data['name'], is_active=True).first()
+        if exercise is None:
+            continue
+        we, _ = WorkoutExercise.objects.get_or_create(
+            session=session,
+            exercise=exercise,
+            defaults={'order': session.workout_exercises.count() + 1},
+        )
+        set_number_start = we.sets.count() + 1
+        for i, set_data in enumerate(ex_data.get('sets', [])):
+            WorkoutSet.objects.create(
+                workout_exercise=we,
+                set_number=set_number_start + i,
+                weight_kg=set_data.get('weight_kg', 0),
+                reps=set_data.get('reps', 1),
+            )
+    return redirect('gym_active_session', session_id=session.id)
