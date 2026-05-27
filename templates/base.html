@@ -34,9 +34,10 @@
       <span class="nav-icon">✎</span>
       <span>Log</span>
     </a>
-    <a href="#" class="nav-item">
+    <a href="{% url 'gym_history' %}"
+       class="nav-item {% if request.resolver_match.url_name == 'gym_history' or request.resolver_match.url_name == 'gym_session_detail' %}active{% endif %}">
       <span class="nav-icon">◎</span>
-      <span>Coach</span>
+      <span>History</span>
     </a>
     <a href="#" class="nav-item">
       <span class="nav-icon">↗</span>
