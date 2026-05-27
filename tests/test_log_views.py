@@ -96,3 +96,42 @@ def test_add_exercise_sets_order(verified_client):
     verified_client.post(reverse('gym_add_exercise', args=[session.id]), {'exercise_id': ex2.id})
     orders = list(WorkoutExercise.objects.filter(session=session).values_list('order', flat=True))
     assert orders == [1, 2]
+
+
+# ── add_set ───────────────────────────────────────────────────────
+
+@pytest.mark.django_db
+def test_add_set_creates_set(verified_client):
+    session = make_session()
+    ex = make_exercise()
+    we = WorkoutExercise.objects.create(session=session, exercise=ex, order=1)
+    response = verified_client.post(
+        reverse('gym_add_set', args=[session.id, we.id]),
+        {'weight_kg': '60', 'reps': '10'},
+    )
+    assert response.status_code == 302
+    assert WorkoutSet.objects.filter(workout_exercise=we, weight_kg=60, reps=10).exists()
+
+
+@pytest.mark.django_db
+def test_add_set_increments_set_number(verified_client):
+    session = make_session()
+    ex = make_exercise()
+    we = WorkoutExercise.objects.create(session=session, exercise=ex, order=1)
+    verified_client.post(reverse('gym_add_set', args=[session.id, we.id]), {'weight_kg': '60', 'reps': '10'})
+    verified_client.post(reverse('gym_add_set', args=[session.id, we.id]), {'weight_kg': '60', 'reps': '9'})
+    set_numbers = list(WorkoutSet.objects.filter(workout_exercise=we).values_list('set_number', flat=True))
+    assert set_numbers == [1, 2]
+
+
+# ── delete_set ────────────────────────────────────────────────────
+
+@pytest.mark.django_db
+def test_delete_set_removes_set(verified_client):
+    session = make_session()
+    ex = make_exercise()
+    we = WorkoutExercise.objects.create(session=session, exercise=ex, order=1)
+    ws = WorkoutSet.objects.create(workout_exercise=we, set_number=1, weight_kg=60, reps=10)
+    response = verified_client.post(reverse('gym_delete_set', args=[session.id, we.id, ws.id]))
+    assert response.status_code == 302
+    assert not WorkoutSet.objects.filter(id=ws.id).exists()
