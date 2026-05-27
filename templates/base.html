@@ -29,7 +29,8 @@
       <span class="nav-icon">⊞</span>
       <span>Home</span>
     </a>
-    <a href="#" class="nav-item">
+    <a href="{% url 'gym_log_home' %}"
+       class="nav-item {% if request.resolver_match.url_name == 'gym_log_home' or request.resolver_match.url_name == 'gym_active_session' %}active{% endif %}">
       <span class="nav-icon">✎</span>
       <span>Log</span>
     </a>
