@@ -31,4 +31,6 @@ def pin(request):
 
 
 def dashboard(request):
-    return render(request, 'core/dashboard.html')
+    from workouts.models import WorkoutSession
+    last_session = WorkoutSession.objects.filter(status='complete').first()
+    return render(request, 'core/dashboard.html', {'last_session': last_session})

@@ -3,10 +3,15 @@
 
 {% block content %}
 <div class="hero-card">
-  <div class="hero-label">Today's Workout</div>
+  <div class="hero-label">Last Workout</div>
+  {% if last_session %}
+  <div class="hero-day">{{ last_session.name }}</div>
+  <p class="hero-sub">{{ last_session.completed_at|timesince }} ago</p>
+  {% else %}
   <div class="hero-day">No workout yet</div>
   <p class="hero-sub">Log your first workout to get started</p>
   <span class="hero-badge">Start here</span>
+  {% endif %}
 </div>
 
 <div class="section-label">Overload Suggestions</div>
@@ -19,5 +24,5 @@
   <p class="empty-state">No personal records yet</p>
 </div>
 
-<button class="fab" aria-label="Log workout">+</button>
+<a href="{% url 'gym_log_home' %}" class="fab" aria-label="Log workout">+</a>
 {% endblock %}

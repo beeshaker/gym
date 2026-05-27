@@ -46,3 +46,21 @@ def test_exercises_shows_active_exercises(verified_client):
     response = verified_client.get(reverse('gym_exercises'))
     assert b'Bench Press' in response.content
     assert b'Hidden Exercise' not in response.content
+
+
+@pytest.mark.django_db
+def test_dashboard_shows_last_session_name(verified_client):
+    from django.utils import timezone
+    from workouts.models import WorkoutSession
+    WorkoutSession.objects.create(
+        name='Tuesday Pull', status='complete', completed_at=timezone.now(),
+    )
+    response = verified_client.get(reverse('gym_dashboard'))
+    assert b'Tuesday Pull' in response.content
+
+
+@pytest.mark.django_db
+def test_dashboard_no_session_shows_empty_state(verified_client):
+    response = verified_client.get(reverse('gym_dashboard'))
+    assert response.status_code == 200
+    assert b'No workout' in response.content
