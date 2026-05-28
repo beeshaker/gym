@@ -9,6 +9,20 @@ from django.views.decorators.http import require_http_methods
 
 from .models import Exercise, WorkoutExercise, WorkoutSession, WorkoutSet
 from .nl_parser import NLParseError, parse
+from .coach import CoachError, get_ollama_tips, recommend
+
+
+def _get_recommendations(session):
+    recommendations = {}
+    for we in session.workout_exercises.select_related('exercise').prefetch_related('sets'):
+        last_we = (WorkoutExercise.objects
+                   .filter(exercise=we.exercise, session__status='complete')
+                   .exclude(session=session)
+                   .order_by('-session__completed_at')
+                   .first())
+        last_sets = list(last_we.sets.all()) if last_we else []
+        recommendations[we.exercise.id] = recommend(we.exercise, last_sets)
+    return recommendations
 
 
 def exercises(request):
@@ -38,10 +52,12 @@ def active_session(request, session_id):
         return redirect('gym_session_detail', session_id=session.id)
     workout_exercises = session.workout_exercises.select_related('exercise').prefetch_related('sets')
     all_exercises = Exercise.objects.filter(is_active=True).order_by('category', 'name')
+    recommendations = _get_recommendations(session)
     return render(request, 'workouts/active_session.html', {
         'session': session,
         'workout_exercises': workout_exercises,
         'all_exercises': all_exercises,
+        'recommendations': recommendations,
     })
 
 
@@ -164,3 +180,32 @@ def nl_confirm(request, session_id):
                     reps=reps,
                 )
     return redirect('gym_active_session', session_id=session.id)
+
+
+def coach_view(request, session_id):
+    session = get_object_or_404(WorkoutSession, id=session_id, status='active')
+    workout_exercises = session.workout_exercises.select_related('exercise').prefetch_related('sets')
+    recommendations = _get_recommendations(session)
+    return render(request, 'workouts/coach.html', {
+        'session': session,
+        'workout_exercises': workout_exercises,
+        'recommendations': recommendations,
+    })
+
+
+@require_http_methods(['POST'])
+def coach_tips(request, session_id):
+    session = get_object_or_404(WorkoutSession, id=session_id, status='active')
+    recommendations = _get_recommendations(session)
+    exercises_with_recs = []
+    for we in session.workout_exercises.select_related('exercise'):
+        rec = recommendations.get(we.exercise.id, {})
+        exercises_with_recs.append({'name': we.exercise.name, **rec})
+    try:
+        tips = get_ollama_tips(exercises_with_recs)
+        return JsonResponse({'tips': tips})
+    except CoachError as e:
+        return JsonResponse(
+            {'error': str(e) or 'Could not get tips — try again'},
+            status=422,
+        )
