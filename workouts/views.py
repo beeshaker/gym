@@ -14,7 +14,10 @@ from .coach import CoachError, get_ollama_tips, recommend
 
 def _get_recommendations(session):
     recommendations = {}
-    for we in session.workout_exercises.select_related('exercise').prefetch_related('sets'):
+    workout_exercises = list(
+        session.workout_exercises.select_related('exercise').prefetch_related('sets')
+    )
+    for we in workout_exercises:
         last_we = (WorkoutExercise.objects
                    .filter(exercise=we.exercise, session__status='complete')
                    .exclude(session=session)
@@ -22,7 +25,7 @@ def _get_recommendations(session):
                    .first())
         last_sets = list(last_we.sets.all()) if last_we else []
         recommendations[we.exercise.id] = recommend(we.exercise, last_sets)
-    return recommendations
+    return workout_exercises, recommendations
 
 
 def exercises(request):
@@ -50,9 +53,8 @@ def active_session(request, session_id):
     session = get_object_or_404(WorkoutSession, id=session_id)
     if session.status == 'complete':
         return redirect('gym_session_detail', session_id=session.id)
-    workout_exercises = session.workout_exercises.select_related('exercise').prefetch_related('sets')
     all_exercises = Exercise.objects.filter(is_active=True).order_by('category', 'name')
-    recommendations = _get_recommendations(session)
+    workout_exercises, recommendations = _get_recommendations(session)
     return render(request, 'workouts/active_session.html', {
         'session': session,
         'workout_exercises': workout_exercises,
@@ -182,10 +184,10 @@ def nl_confirm(request, session_id):
     return redirect('gym_active_session', session_id=session.id)
 
 
+@require_http_methods(['GET'])
 def coach_view(request, session_id):
     session = get_object_or_404(WorkoutSession, id=session_id, status='active')
-    workout_exercises = session.workout_exercises.select_related('exercise').prefetch_related('sets')
-    recommendations = _get_recommendations(session)
+    workout_exercises, recommendations = _get_recommendations(session)
     return render(request, 'workouts/coach.html', {
         'session': session,
         'workout_exercises': workout_exercises,
@@ -196,9 +198,9 @@ def coach_view(request, session_id):
 @require_http_methods(['POST'])
 def coach_tips(request, session_id):
     session = get_object_or_404(WorkoutSession, id=session_id, status='active')
-    recommendations = _get_recommendations(session)
+    workout_exercises, recommendations = _get_recommendations(session)
     exercises_with_recs = []
-    for we in session.workout_exercises.select_related('exercise'):
+    for we in workout_exercises:
         rec = recommendations.get(we.exercise.id, {})
         exercises_with_recs.append({'name': we.exercise.name, **rec})
     try:
