@@ -691,3 +691,70 @@ button { cursor: pointer; font-family: inherit; }
   font-size: 13px;
   cursor: pointer;
 }
+
+/* ── Coach recommendations ───────────────────────────────────────── */
+.coach-inline {
+  font-size: 11px;
+  color: var(--text-sec);
+  margin: 5px 0 8px;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 5px;
+  line-height: 1.5;
+}
+
+.coach-badge {
+  display: inline-block;
+  font-size: 9px;
+  font-weight: 700;
+  border-radius: 4px;
+  padding: 2px 6px;
+  flex-shrink: 0;
+}
+
+.coach-badge.increase { background: #14532D; color: #22C55E; }
+.coach-badge.hold     { background: #1F2937; color: #9CA3AF; }
+.coach-badge.deload   { background: #450A0A; color: #F87171; }
+.coach-badge.start    { background: #0C1A2E; color: #38BDF8; }
+
+.coach-tip-text {
+  font-size: 11px;
+  color: var(--accent);
+  font-style: italic;
+  margin-top: 4px;
+  width: 100%;
+}
+
+/* ── Coach tab ───────────────────────────────────────────────────── */
+.coach-card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-card);
+  padding: 14px 16px;
+  margin-bottom: 12px;
+}
+
+.coach-card .we-name { font-size: 15px; font-weight: 700; margin-bottom: 2px; }
+.coach-card .we-meta { font-size: 11px; color: var(--text-sec); margin-bottom: 6px; }
+
+.coach-tips-btn {
+  display: block;
+  width: 100%;
+  background: var(--card2);
+  border: 1px solid var(--accent);
+  border-radius: var(--radius-btn);
+  color: var(--accent);
+  font-size: 13px;
+  font-weight: 600;
+  padding: 10px;
+  text-align: center;
+  cursor: pointer;
+  margin-bottom: 16px;
+}
+
+.coach-tips-error {
+  font-size: 11px;
+  color: #EF4444;
+  margin-bottom: 12px;
+}
