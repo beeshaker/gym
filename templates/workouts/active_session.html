@@ -1,4 +1,5 @@
 {% extends 'base.html' %}
+{% load workout_extras %}
 {% block title %}{{ session.name }} — Gym AI{% endblock %}
 
 {% block content %}
@@ -35,6 +36,30 @@
 <div class="we-card">
   <div class="we-name">{{ we.exercise.name }}</div>
   <div class="we-meta">{{ we.exercise.get_category_display }} · {{ we.exercise.get_equipment_display }}</div>
+
+  {% with rec=recommendations|get_item:we.exercise.id %}
+  {% if rec %}
+  <div class="coach-inline">
+    {% if rec.action == 'start' %}
+    <span class="coach-badge start">First time</span>
+    Aim for {{ rec.target_reps_min }}–{{ rec.target_reps_max }} reps
+    {% elif rec.action == 'increase' %}
+    <span class="coach-badge increase">▲ Increase</span>
+    Last: {{ rec.last_weight }} kg × {{ rec.last_reps }}
+    &nbsp;·&nbsp; Try <strong>{{ rec.target_weight }} kg × {{ rec.target_reps_min }}–{{ rec.target_reps_max }}</strong>
+    {% elif rec.action == 'hold' %}
+    <span class="coach-badge hold">→ Hold</span>
+    Last: {{ rec.last_weight }} kg × {{ rec.last_reps }}
+    &nbsp;·&nbsp; Aim for <strong>{{ rec.target_weight }} kg × {{ rec.target_reps_max }} reps</strong>
+    {% else %}
+    <span class="coach-badge deload">▽ Back off</span>
+    Last: {{ rec.last_weight }} kg × {{ rec.last_reps }}
+    &nbsp;·&nbsp; Try <strong>{{ rec.target_weight }} kg</strong>
+    {% endif %}
+    <div class="coach-tip-text" id="coach-tip-{{ we.exercise.id }}" style="display:none"></div>
+  </div>
+  {% endif %}
+  {% endwith %}
 
   {% with sets=we.sets.all %}
   {% if sets %}

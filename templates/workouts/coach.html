@@ -1,4 +1,93 @@
 {% extends 'base.html' %}
+{% load workout_extras %}
+{% block title %}Coach — {{ session.name }} — Gym AI{% endblock %}
+
 {% block content %}
-{% for we in workout_exercises %}{{ we.exercise.name }}{% endfor %}
+<div class="session-title">Coach — {{ session.name }}</div>
+
+<button type="button" class="coach-tips-btn" id="coach-tips-btn">✦ Get Ollama tips</button>
+<div id="coach-tips-error" class="coach-tips-error" style="display:none"></div>
+
+{% for we in workout_exercises %}
+{% with rec=recommendations|get_item:we.exercise.id %}
+<div class="coach-card">
+  <div class="we-name">{{ we.exercise.name }}</div>
+  <div class="we-meta">{{ we.exercise.get_category_display }} · {{ we.exercise.get_equipment_display }}</div>
+
+  {% if rec %}
+  <div class="coach-inline">
+    {% if rec.action == 'start' %}
+    <span class="coach-badge start">First time</span>
+    Aim for {{ rec.target_reps_min }}–{{ rec.target_reps_max }} reps
+    {% elif rec.action == 'increase' %}
+    <span class="coach-badge increase">▲ Increase</span>
+    Last: {{ rec.last_weight }} kg × {{ rec.last_reps }}
+    &nbsp;·&nbsp; Try <strong>{{ rec.target_weight }} kg × {{ rec.target_reps_min }}–{{ rec.target_reps_max }}</strong>
+    {% elif rec.action == 'hold' %}
+    <span class="coach-badge hold">→ Hold</span>
+    Last: {{ rec.last_weight }} kg × {{ rec.last_reps }}
+    &nbsp;·&nbsp; Aim for <strong>{{ rec.target_weight }} kg × {{ rec.target_reps_max }} reps</strong>
+    {% else %}
+    <span class="coach-badge deload">▽ Back off</span>
+    Last: {{ rec.last_weight }} kg × {{ rec.last_reps }}
+    &nbsp;·&nbsp; Try <strong>{{ rec.target_weight }} kg</strong>
+    {% endif %}
+    <div class="coach-tip-text" id="coach-tip-{{ we.exercise.id }}" style="display:none"></div>
+  </div>
+  {% endif %}
+</div>
+{% endwith %}
+{% empty %}
+<p class="empty-state">No exercises in this session yet. Add some from the Log tab.</p>
+{% endfor %}
+{% endblock %}
+
+{% block scripts %}
+<script>
+const COACH_TIPS_URL = '{% url "gym_coach_tips" session.id %}';
+const CSRF_TOKEN = '{{ csrf_token }}';
+
+document.getElementById('coach-tips-btn').addEventListener('click', function () {
+  const btn = this;
+  btn.textContent = '…';
+  btn.disabled = true;
+  document.getElementById('coach-tips-error').style.display = 'none';
+
+  const body = new FormData();
+  body.append('csrfmiddlewaretoken', CSRF_TOKEN);
+
+  fetch(COACH_TIPS_URL, { method: 'POST', body: body })
+    .then(function (r) { return r.json().then(function (d) { return { ok: r.ok, data: d }; }); })
+    .then(function (res) {
+      btn.textContent = '✦ Get Ollama tips';
+      btn.disabled = false;
+      if (!res.ok) {
+        const el = document.getElementById('coach-tips-error');
+        el.textContent = res.data.error || 'Could not get tips — try again';
+        el.style.display = 'block';
+        return;
+      }
+      const tips = res.data.tips || {};
+      Object.keys(tips).forEach(function (name) {
+        document.querySelectorAll('.coach-card').forEach(function (card) {
+          if (card.querySelector('.we-name') &&
+              card.querySelector('.we-name').textContent.trim() === name) {
+            const tipEl = card.querySelector('.coach-tip-text');
+            if (tipEl) {
+              tipEl.textContent = tips[name];
+              tipEl.style.display = 'block';
+            }
+          }
+        });
+      });
+    })
+    .catch(function () {
+      btn.textContent = '✦ Get Ollama tips';
+      btn.disabled = false;
+      const el = document.getElementById('coach-tips-error');
+      el.textContent = 'Request failed — check your connection';
+      el.style.display = 'block';
+    });
+});
+</script>
 {% endblock %}

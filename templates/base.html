@@ -39,10 +39,18 @@
       <span class="nav-icon">◎</span>
       <span>History</span>
     </a>
+    {% if active_session %}
+    <a href="{% url 'gym_coach' active_session.id %}"
+       class="nav-item {% if request.resolver_match.url_name == 'gym_coach' %}active{% endif %}">
+      <span class="nav-icon">↗</span>
+      <span>Coach</span>
+    </a>
+    {% else %}
     <a href="#" class="nav-item">
       <span class="nav-icon">↗</span>
-      <span>Progress</span>
+      <span>Coach</span>
     </a>
+    {% endif %}
     <a href="{% url 'gym_exercises' %}"
        class="nav-item {% if request.resolver_match.url_name == 'gym_exercises' %}active{% endif %}">
       <span class="nav-icon">☰</span>
