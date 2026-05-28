@@ -1,5 +1,6 @@
 import json
 
+from django.db import transaction
 from django.db.models import Max, Prefetch
 from django.http import JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
@@ -134,24 +135,25 @@ def nl_confirm(request, session_id):
         exercises_data = data['exercises']
     except (json.JSONDecodeError, KeyError, TypeError):
         return redirect('gym_active_session', session_id=session.id)
-    for ex_data in exercises_data:
-        exercise_name = ex_data.get('name', '')
-        if not exercise_name:
-            continue
-        exercise = Exercise.objects.filter(name__iexact=exercise_name, is_active=True).first()
-        if exercise is None:
-            continue
-        we, _ = WorkoutExercise.objects.get_or_create(
-            session=session,
-            exercise=exercise,
-            defaults={'order': session.workout_exercises.count() + 1},
-        )
-        set_number_start = we.sets.count() + 1
-        for i, set_data in enumerate(ex_data.get('sets', [])):
-            WorkoutSet.objects.create(
-                workout_exercise=we,
-                set_number=set_number_start + i,
-                weight_kg=set_data.get('weight_kg', 0),
-                reps=set_data.get('reps', 1),
+    with transaction.atomic():
+        for ex_data in exercises_data:
+            exercise_name = ex_data.get('name', '')
+            if not exercise_name:
+                continue
+            exercise = Exercise.objects.filter(name__iexact=exercise_name, is_active=True).first()
+            if exercise is None:
+                continue
+            we, _ = WorkoutExercise.objects.get_or_create(
+                session=session,
+                exercise=exercise,
+                defaults={'order': session.workout_exercises.count() + 1},
             )
+            set_number_start = we.sets.count() + 1
+            for i, set_data in enumerate(ex_data.get('sets', [])):
+                WorkoutSet.objects.create(
+                    workout_exercise=we,
+                    set_number=set_number_start + i,
+                    weight_kg=set_data.get('weight_kg', 0),
+                    reps=set_data.get('reps', 1),
+                )
     return redirect('gym_active_session', session_id=session.id)
