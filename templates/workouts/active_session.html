@@ -177,7 +177,9 @@ function renderPreview(data) {
     (ex.sets || []).forEach(function (s, i) {
       const setEl = document.createElement('div');
       setEl.className = 'preview-set';
-      setEl.innerHTML = 'Set ' + (i + 1) + ' · <strong>' + s.weight_kg + ' kg × ' + s.reps + ' reps</strong>';
+      const w = Number(s.weight_kg);
+      const r = Number(s.reps);
+      setEl.innerHTML = 'Set ' + (i + 1) + ' · <strong>' + w + ' kg × ' + r + ' reps</strong>';
       body.appendChild(setEl);
     });
   });
@@ -186,6 +188,7 @@ function renderPreview(data) {
 function discardPreview() {
   document.getElementById('nl-preview').style.display = 'none';
   document.getElementById('nl-text').value = '';
+  document.getElementById('nl-error').style.display = 'none';
   document.getElementById('nl-quick-add').style.display = 'block';
 }
 </script>

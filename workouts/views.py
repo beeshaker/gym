@@ -150,10 +150,17 @@ def nl_confirm(request, session_id):
             )
             set_number_start = we.sets.count() + 1
             for i, set_data in enumerate(ex_data.get('sets', [])):
+                try:
+                    weight_kg = float(set_data.get('weight_kg', 0))
+                    reps = int(set_data.get('reps', 1))
+                except (TypeError, ValueError):
+                    continue
+                if weight_kg < 0 or reps < 1:
+                    continue
                 WorkoutSet.objects.create(
                     workout_exercise=we,
                     set_number=set_number_start + i,
-                    weight_kg=set_data.get('weight_kg', 0),
-                    reps=set_data.get('reps', 1),
+                    weight_kg=weight_kg,
+                    reps=reps,
                 )
     return redirect('gym_active_session', session_id=session.id)
