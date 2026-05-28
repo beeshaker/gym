@@ -63,6 +63,9 @@ def get_ollama_tips(exercises_with_recs: list) -> dict:
     Returns: {"Exercise Name": "one-sentence tip", ...}
     Raises CoachError on any Ollama failure.
     """
+    if not exercises_with_recs:
+        return {}
+
     lines = []
     for ex in exercises_with_recs:
         if ex['action'] == 'start':
@@ -94,7 +97,10 @@ def get_ollama_tips(exercises_with_recs: list) -> dict:
     except requests.exceptions.RequestException as e:
         raise CoachError(f'Ollama request failed: {e}')
 
-    raw = resp.json().get('response', '')
+    try:
+        raw = resp.json().get('response', '')
+    except Exception:
+        raise CoachError('Ollama returned invalid response')
     m = re.search(r'\{.*\}', raw, re.DOTALL)
     if not m:
         raise CoachError('Ollama returned no JSON')
