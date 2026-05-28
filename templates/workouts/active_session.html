@@ -4,6 +4,33 @@
 {% block content %}
 <div class="session-title">{{ session.name }}</div>
 
+<!-- Natural language quick-add -->
+<div class="nl-quick-add" id="nl-quick-add">
+  <div class="nl-box-label">Quick add</div>
+  <div class="nl-row">
+    <textarea id="nl-text" class="nl-textarea" rows="2"
+              placeholder="e.g. bench press, 3 sets of 10 at 60kg"></textarea>
+    <button type="button" class="nl-btn" id="nl-submit">→</button>
+  </div>
+  <div id="nl-error" class="nl-error" style="display:none"></div>
+</div>
+
+<!-- Preview card (hidden until parse succeeds) -->
+<div id="nl-preview" style="display:none">
+  <form method="post" action="{% url 'gym_nl_confirm' session.id %}">
+    {% csrf_token %}
+    <input type="hidden" name="parsed_json" id="nl-parsed-json">
+    <div class="preview-card">
+      <div class="preview-label">✓ Parsed — confirm to add</div>
+      <div id="preview-body"></div>
+      <div class="btn-row" style="display:flex;gap:8px;margin-top:12px">
+        <button type="submit" class="btn-confirm">Add ✓</button>
+        <button type="button" class="btn-discard" onclick="discardPreview()">Discard</button>
+      </div>
+    </div>
+  </form>
+</div>
+
 {% for we in workout_exercises %}
 <div class="we-card">
   <div class="we-name">{{ we.exercise.name }}</div>
@@ -81,6 +108,9 @@
 
 {% block scripts %}
 <script>
+const NL_PARSE_URL = '{% url "gym_nl_parse" session.id %}';
+const CSRF_TOKEN = '{{ csrf_token }}';
+
 function openPicker() {
   document.getElementById('picker-overlay').classList.add('open');
   document.getElementById('picker-search').focus();
@@ -98,5 +128,65 @@ document.getElementById('picker-search').addEventListener('input', function () {
 document.getElementById('picker-overlay').addEventListener('click', function (e) {
   if (e.target === this) closePicker();
 });
+
+document.getElementById('nl-submit').addEventListener('click', function () {
+  const text = document.getElementById('nl-text').value.trim();
+  if (!text) return;
+  const btn = this;
+  btn.textContent = '…';
+  btn.disabled = true;
+  document.getElementById('nl-error').style.display = 'none';
+
+  const body = new FormData();
+  body.append('text', text);
+  body.append('csrfmiddlewaretoken', CSRF_TOKEN);
+
+  fetch(NL_PARSE_URL, { method: 'POST', body: body })
+    .then(function (r) { return r.json().then(function (d) { return { ok: r.ok, data: d }; }); })
+    .then(function (res) {
+      btn.textContent = '→';
+      btn.disabled = false;
+      if (!res.ok) {
+        const el = document.getElementById('nl-error');
+        el.textContent = res.data.error || 'Could not parse — try rephrasing';
+        el.style.display = 'block';
+        return;
+      }
+      renderPreview(res.data);
+      document.getElementById('nl-parsed-json').value = JSON.stringify(res.data);
+      document.getElementById('nl-quick-add').style.display = 'none';
+      document.getElementById('nl-preview').style.display = 'block';
+    })
+    .catch(function () {
+      btn.textContent = '→';
+      btn.disabled = false;
+      const el = document.getElementById('nl-error');
+      el.textContent = 'Request failed — check your connection';
+      el.style.display = 'block';
+    });
+});
+
+function renderPreview(data) {
+  const body = document.getElementById('preview-body');
+  body.innerHTML = '';
+  (data.exercises || []).forEach(function (ex) {
+    const nameEl = document.createElement('div');
+    nameEl.className = 'preview-ex';
+    nameEl.textContent = ex.name;
+    body.appendChild(nameEl);
+    (ex.sets || []).forEach(function (s, i) {
+      const setEl = document.createElement('div');
+      setEl.className = 'preview-set';
+      setEl.innerHTML = 'Set ' + (i + 1) + ' · <strong>' + s.weight_kg + ' kg × ' + s.reps + ' reps</strong>';
+      body.appendChild(setEl);
+    });
+  });
+}
+
+function discardPreview() {
+  document.getElementById('nl-preview').style.display = 'none';
+  document.getElementById('nl-text').value = '';
+  document.getElementById('nl-quick-add').style.display = 'block';
+}
 </script>
 {% endblock %}
