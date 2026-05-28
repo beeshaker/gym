@@ -1,0 +1,19 @@
+[Unit]
+Description=Gym Progress AI (gunicorn)
+After=network.target
+
+[Service]
+User=YOUR_VPS_USER
+WorkingDirectory=/home/YOUR_VPS_USER/gym
+EnvironmentFile=/home/YOUR_VPS_USER/gym/.env
+ExecStart=/home/YOUR_VPS_USER/gym/venv/bin/gunicorn \
+    gym_progress_ai.wsgi:application \
+    --bind 127.0.0.1:8001 \
+    --workers 2 \
+    --timeout 60 \
+    --access-logfile /var/log/gym-gunicorn.log \
+    --error-logfile /var/log/gym-gunicorn-error.log
+Restart=on-failure
+
+[Install]
+WantedBy=multi-user.target
