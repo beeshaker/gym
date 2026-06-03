@@ -36,7 +36,7 @@ def _log_home_context():
             'category': cat,
             'label': dict(Exercise.CATEGORY_CHOICES)[cat],
             'last_date': session.completed_at,
-            'exercise_count': session.workout_exercises.count(),
+            'exercise_count': len(session.workout_exercises.all()),
         }
         for cat, session in last_by_cat.items()
     ]
@@ -273,7 +273,7 @@ def repeat_start(request, category):
                     if weight < 0 or reps < 1:
                         n += 1
                         continue
-                except (ValueError, TypeError):
+                except (ValueError, TypeError, KeyError):
                     n += 1
                     continue
                 WorkoutSet.objects.create(
