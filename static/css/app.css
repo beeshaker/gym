@@ -758,3 +758,79 @@ button { cursor: pointer; font-family: inherit; }
   color: #EF4444;
   margin-bottom: 12px;
 }
+
+/* ── Quick Repeat ────────────────────────────────────────────────── */
+.repeat-section {
+  margin-top: 20px;
+}
+
+.repeat-divider {
+  font-size: 9px;
+  color: var(--text-sec);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  font-weight: 600;
+  text-align: center;
+  margin: 8px 0 10px;
+}
+
+.repeat-btn {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-card);
+  padding: 10px 14px;
+  text-decoration: none;
+  color: var(--text);
+  margin-bottom: 8px;
+}
+
+.repeat-icon {
+  font-size: 18px;
+  color: var(--accent);
+  flex-shrink: 0;
+}
+
+.repeat-label {
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.repeat-meta {
+  font-size: 11px;
+  color: var(--text-sec);
+  margin-top: 1px;
+}
+
+/* ── Repeat preview ──────────────────────────────────────────────── */
+.preview-set-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 6px;
+}
+
+.preview-set-label {
+  font-size: 10px;
+  color: var(--text-sec);
+  width: 36px;
+  flex-shrink: 0;
+}
+
+.preview-input {
+  background: var(--card2);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: 4px 8px;
+  font-size: 12px;
+  color: var(--text);
+  width: 60px;
+  text-align: center;
+}
+
+.preview-sep {
+  font-size: 11px;
+  color: var(--text-sec);
+}
