@@ -1,7 +1,6 @@
 from collections import Counter
 
 from .coach import recommend
-from .models import WorkoutExercise
 
 VALID_CATEGORIES = {'push', 'pull', 'legs', 'upper_arms', 'conditioning_abs'}
 
@@ -63,16 +62,26 @@ def get_repeat_preview(category: str) -> dict | None:
     if template_session is None:
         return None
 
+    from .models import WorkoutExercise
+
     exercises_data = []
     wes = (template_session.workout_exercises
            .select_related('exercise')
            .prefetch_related('sets')
            .order_by('order'))
+
+    # Batch query to find last completed workout exercise for each exercise
+    exercise_ids = [we.exercise_id for we in wes]
+    last_wes_qs = (WorkoutExercise.objects
+                   .filter(exercise_id__in=exercise_ids, session__status='complete')
+                   .select_related('exercise')
+                   .prefetch_related('sets')
+                   .order_by('exercise_id', '-session__completed_at')
+                   .distinct('exercise_id'))
+    last_we_by_exercise = {lw.exercise_id: lw for lw in last_wes_qs}
+
     for we in wes:
-        last_we = (WorkoutExercise.objects
-                   .filter(exercise=we.exercise, session__status='complete')
-                   .order_by('-session__completed_at')
-                   .first())
+        last_we = last_we_by_exercise.get(we.exercise_id)
         last_sets = list(last_we.sets.all()) if last_we else []
         rec = recommend(we.exercise, last_sets)
         sets_count = rec['last_sets_count'] if rec['last_sets_count'] > 0 else we.exercise.default_sets
