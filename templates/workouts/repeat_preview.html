@@ -1,0 +1,4 @@
+{% extends 'base.html' %}
+{% block content %}
+{% for item in exercises %}{{ item.exercise.name }}{% endfor %}
+{% endblock %}

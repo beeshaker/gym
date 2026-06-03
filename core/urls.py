@@ -20,6 +20,8 @@ urlpatterns = [
     path('log/<int:session_id>/nl-confirm/', workout_views.nl_confirm, name='gym_nl_confirm'),
     path('log/<int:session_id>/coach/', workout_views.coach_view, name='gym_coach'),
     path('log/<int:session_id>/coach-tips/', workout_views.coach_tips, name='gym_coach_tips'),
+    path('log/repeat/<str:category>/', workout_views.repeat_preview, name='gym_repeat_preview'),
+    path('log/repeat/<str:category>/start/', workout_views.repeat_start, name='gym_repeat_start'),
     # History
     path('history/', workout_views.history, name='gym_history'),
     path('history/<int:session_id>/', workout_views.session_detail, name='gym_session_detail'),

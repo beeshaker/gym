@@ -10,6 +10,16 @@
 
   {% if error %}<p class="pin-error">{{ error }}</p>{% endif %}
 
+  {% if repeat_options %}
+  <div class="repeat-options">
+    {% for option in repeat_options %}
+    <a href="{% url 'gym_repeat_preview' option.category %}" class="btn btn-secondary">
+      Quick Repeat {{ option.label }}
+    </a>
+    {% endfor %}
+  </div>
+  {% endif %}
+
   <form method="post" action="{% url 'gym_log_start' %}">
     {% csrf_token %}
     <input type="text" name="name" class="form-input" placeholder="e.g. Monday Push"

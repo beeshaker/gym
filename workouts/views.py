@@ -2,7 +2,7 @@ import json
 
 from django.db import transaction
 from django.db.models import Max, Prefetch
-from django.http import JsonResponse
+from django.http import Http404, JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.utils import timezone
 from django.views.decorators.http import require_http_methods
@@ -10,6 +10,7 @@ from django.views.decorators.http import require_http_methods
 from .models import Exercise, WorkoutExercise, WorkoutSession, WorkoutSet
 from .nl_parser import NLParseError, parse
 from .coach import CoachError, get_ollama_tips, recommend
+from .repeat import get_last_sessions_by_category, get_repeat_preview
 
 
 def _get_recommendations(session):
@@ -28,6 +29,20 @@ def _get_recommendations(session):
     return workout_exercises, recommendations
 
 
+def _log_home_context():
+    last_by_cat = get_last_sessions_by_category()
+    repeat_options = [
+        {
+            'category': cat,
+            'label': dict(Exercise.CATEGORY_CHOICES)[cat],
+            'last_date': session.completed_at,
+            'exercise_count': session.workout_exercises.count(),
+        }
+        for cat, session in last_by_cat.items()
+    ]
+    return {'repeat_options': repeat_options}
+
+
 def exercises(request):
     exercise_list = Exercise.objects.filter(is_active=True).order_by('category', 'name')
     return render(request, 'workouts/exercises.html', {'exercises': exercise_list})
@@ -37,14 +52,16 @@ def log_home(request):
     active = WorkoutSession.objects.filter(status='active').first()
     if active:
         return redirect('gym_active_session', session_id=active.id)
-    return render(request, 'workouts/log_home.html')
+    return render(request, 'workouts/log_home.html', _log_home_context())
 
 
 @require_http_methods(['POST'])
 def start_session(request):
     name = request.POST.get('name', '').strip()
     if not name:
-        return render(request, 'workouts/log_home.html', {'error': 'Please enter a session name.'})
+        ctx = _log_home_context()
+        ctx['error'] = 'Please enter a session name.'
+        return render(request, 'workouts/log_home.html', ctx)
     session = WorkoutSession.objects.create(name=name)
     return redirect('gym_active_session', session_id=session.id)
 
@@ -211,3 +228,59 @@ def coach_tips(request, session_id):
             {'error': str(e) or 'Could not get tips — try again'},
             status=422,
         )
+
+
+@require_http_methods(['GET'])
+def repeat_preview(request, category):
+    preview = get_repeat_preview(category)
+    if preview is None:
+        raise Http404
+    today = timezone.localdate()
+    label = dict(Exercise.CATEGORY_CHOICES).get(category, category.title())
+    session_name = f"{today.strftime('%A')} {label}"
+    return render(request, 'workouts/repeat_preview.html', {
+        'category': category,
+        'session_name': session_name,
+        'exercises': preview['exercises'],
+    })
+
+
+@require_http_methods(['POST'])
+def repeat_start(request, category):
+    name = request.POST.get('name', '').strip()
+    if not name:
+        return redirect('gym_log_home')
+    exercise_ids = request.POST.getlist('exercise_id')
+    with transaction.atomic():
+        session = WorkoutSession.objects.create(name=name)
+        for order, ex_id in enumerate(exercise_ids, start=1):
+            try:
+                exercise = Exercise.objects.get(id=ex_id, is_active=True)
+            except Exercise.DoesNotExist:
+                continue
+            we = WorkoutExercise.objects.create(
+                session=session, exercise=exercise, order=order
+            )
+            n = 1
+            while True:
+                weight_key = f'weight_{ex_id}_{n}'
+                reps_key = f'reps_{ex_id}_{n}'
+                if weight_key not in request.POST:
+                    break
+                try:
+                    weight = float(request.POST[weight_key])
+                    reps = int(request.POST[reps_key])
+                    if weight < 0 or reps < 1:
+                        n += 1
+                        continue
+                except (ValueError, TypeError):
+                    n += 1
+                    continue
+                WorkoutSet.objects.create(
+                    workout_exercise=we,
+                    set_number=n,
+                    weight_kg=weight,
+                    reps=reps,
+                )
+                n += 1
+    return redirect('gym_active_session', session_id=session.id)
