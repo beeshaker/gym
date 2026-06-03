@@ -11,10 +11,15 @@
   {% if error %}<p class="pin-error">{{ error }}</p>{% endif %}
 
   {% if repeat_options %}
-  <div class="repeat-options">
-    {% for option in repeat_options %}
-    <a href="{% url 'gym_repeat_preview' option.category %}" class="btn btn-secondary">
-      Quick Repeat {{ option.label }}
+  <div class="repeat-section">
+    <div class="repeat-divider">↺ Quick Repeat</div>
+    {% for opt in repeat_options %}
+    <a href="{% url 'gym_repeat_preview' opt.category %}" class="repeat-btn">
+      <span class="repeat-icon">↺</span>
+      <div>
+        <div class="repeat-label">{{ opt.label }}</div>
+        <div class="repeat-meta">Last: {{ opt.last_date|date:"D j M" }} · {{ opt.exercise_count }} exercise{{ opt.exercise_count|pluralize }}</div>
+      </div>
     </a>
     {% endfor %}
   </div>

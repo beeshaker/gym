@@ -1,4 +1,47 @@
 {% extends 'base.html' %}
+{% load workout_extras %}
+{% block title %}{{ session_name }} — Gym AI{% endblock %}
+
 {% block content %}
-{% for item in exercises %}{{ item.exercise.name }}{% endfor %}
+<div class="page-header">
+  <h1 class="page-title">{{ session_name }}</h1>
+  <p class="page-sub">Adjust weights &amp; reps, then start</p>
+</div>
+
+<form method="post" action="{% url 'gym_repeat_start' category %}">
+  {% csrf_token %}
+  <input type="hidden" name="name" value="{{ session_name }}">
+
+  {% for item in exercises %}
+  <div class="we-card">
+    <div class="we-name">
+      {{ item.exercise.name }}
+      {% if item.rec.action == 'increase' %}
+      <span class="coach-badge increase">▲ Increase</span>
+      {% elif item.rec.action == 'hold' %}
+      <span class="coach-badge hold">→ Hold</span>
+      {% elif item.rec.action == 'deload' %}
+      <span class="coach-badge deload">▽ Back off</span>
+      {% else %}
+      <span class="coach-badge start">First time</span>
+      {% endif %}
+    </div>
+    <div class="we-meta">{{ item.exercise.get_category_display }} · {{ item.exercise.get_equipment_display }}</div>
+    <input type="hidden" name="exercise_id" value="{{ item.exercise.id }}">
+    {% for s in item.sets %}
+    <div class="preview-set-row">
+      <span class="preview-set-label">Set {{ s.n }}</span>
+      <input type="number" step="0.5" min="0" name="weight_{{ item.exercise.id }}_{{ s.n }}"
+             value="{{ s.weight }}" class="preview-input">
+      <span class="preview-sep">kg ×</span>
+      <input type="number" min="1" name="reps_{{ item.exercise.id }}_{{ s.n }}"
+             value="{{ s.reps }}" class="preview-input">
+      <span class="preview-sep">reps</span>
+    </div>
+    {% endfor %}
+  </div>
+  {% endfor %}
+
+  <button type="submit" class="btn btn-primary" style="margin-top:8px">▶ Start Session</button>
+</form>
 {% endblock %}
