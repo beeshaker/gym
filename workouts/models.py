@@ -118,6 +118,7 @@ class ProgramDay(models.Model):
 
     class Meta:
         ordering = ['order']
+        unique_together = [('program', 'name')]
 
     def __str__(self):
         return f'{self.program.name} — {self.name}'
@@ -133,15 +134,16 @@ class ProgramExercise(models.Model):
 
     class Meta:
         ordering = ['order']
+        unique_together = [('program_day', 'exercise')]
 
     def effective_sets(self):
-        return self.sets_override or self.exercise.default_sets
+        return self.sets_override if self.sets_override is not None else self.exercise.default_sets
 
     def effective_min_reps(self):
-        return self.min_reps_override or self.exercise.default_min_reps
+        return self.min_reps_override if self.min_reps_override is not None else self.exercise.default_min_reps
 
     def effective_max_reps(self):
-        return self.max_reps_override or self.exercise.default_max_reps
+        return self.max_reps_override if self.max_reps_override is not None else self.exercise.default_max_reps
 
     def __str__(self):
         return f'{self.program_day} — {self.exercise.name}'
