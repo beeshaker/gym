@@ -84,10 +84,29 @@ document.querySelectorAll('.swap-btn').forEach(function (btn) {
           data.alternatives.forEach(function (alt) {
             const div = document.createElement('div');
             div.className = 'swap-option';
-            div.innerHTML =
-              '<div><div class="swap-option-name">' + alt.name + '</div>' +
-              '<div class="swap-option-meta">' + alt.equipment + ' · ' + alt.movement_type + '</div></div>' +
-              '<button type="button" class="swap-use-btn" data-id="' + alt.id + '" data-name="' + alt.name + '" data-eq="' + alt.equipment + ' · ' + alt.movement_type + '">Use</button>';
+
+            // Left side: name + meta
+            const infoDiv = document.createElement('div');
+            const nameDiv = document.createElement('div');
+            nameDiv.className = 'swap-option-name';
+            nameDiv.textContent = alt.name;
+            const metaDiv = document.createElement('div');
+            metaDiv.className = 'swap-option-meta';
+            metaDiv.textContent = alt.equipment + ' · ' + alt.movement_type;
+            infoDiv.appendChild(nameDiv);
+            infoDiv.appendChild(metaDiv);
+
+            // Use button
+            const useBtn2 = document.createElement('button');
+            useBtn2.type = 'button';
+            useBtn2.className = 'swap-use-btn';
+            useBtn2.textContent = 'Use';
+            useBtn2.setAttribute('data-id', alt.id);
+            useBtn2.setAttribute('data-name', alt.name);
+            useBtn2.setAttribute('data-eq', alt.equipment + ' · ' + alt.movement_type);
+
+            div.appendChild(infoDiv);
+            div.appendChild(useBtn2);
             list.appendChild(div);
           });
           list.querySelectorAll('.swap-use-btn').forEach(function (useBtn) {
@@ -110,7 +129,7 @@ document.querySelectorAll('.swap-btn').forEach(function (btn) {
               btn.setAttribute('data-exercise-id', newId);
 
               const nameSpan = card.querySelector('.we-name-text');
-              const badge = nameSpan.querySelector('span');
+              const badge = nameSpan.querySelector('.coach-badge');
               nameSpan.textContent = newName + ' ';
               if (badge) nameSpan.appendChild(badge);
 
