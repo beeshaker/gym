@@ -22,6 +22,11 @@ urlpatterns = [
     path('log/<int:session_id>/coach-tips/', workout_views.coach_tips, name='gym_coach_tips'),
     path('log/repeat/<str:category>/', workout_views.repeat_preview, name='gym_repeat_preview'),
     path('log/repeat/<str:category>/start/', workout_views.repeat_start, name='gym_repeat_start'),
+    # Programs
+    path('programs/start/', workout_views.program_start, name='gym_program_start'),
+    path('programs/<int:program_id>/', workout_views.program_day_list, name='gym_program_days'),
+    path('programs/<int:day_id>/preview/', workout_views.program_preview, name='gym_program_preview'),
+    path('programs/swap/<int:exercise_id>/', workout_views.program_swap_options, name='gym_program_swap'),
     # History
     path('history/', workout_views.history, name='gym_history'),
     path('history/<int:session_id>/', workout_views.session_detail, name='gym_session_detail'),
