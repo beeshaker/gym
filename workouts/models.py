@@ -97,3 +97,51 @@ class WorkoutSet(models.Model):
 
     def __str__(self):
         return f'Set {self.set_number}: {self.weight_kg}kg × {self.reps}'
+
+
+class Program(models.Model):
+    name        = models.CharField(max_length=100, unique=True)
+    description = models.CharField(max_length=200, blank=True)
+    is_active   = models.BooleanField(default=True)
+
+    class Meta:
+        ordering = ['name']
+
+    def __str__(self):
+        return self.name
+
+
+class ProgramDay(models.Model):
+    program = models.ForeignKey(Program, on_delete=models.CASCADE, related_name='days')
+    name    = models.CharField(max_length=50)
+    order   = models.PositiveIntegerField(default=0)
+
+    class Meta:
+        ordering = ['order']
+
+    def __str__(self):
+        return f'{self.program.name} — {self.name}'
+
+
+class ProgramExercise(models.Model):
+    program_day       = models.ForeignKey(ProgramDay, on_delete=models.CASCADE, related_name='exercises')
+    exercise          = models.ForeignKey('Exercise', on_delete=models.PROTECT, related_name='program_exercises')
+    order             = models.PositiveIntegerField(default=0)
+    sets_override     = models.PositiveIntegerField(null=True, blank=True)
+    min_reps_override = models.PositiveIntegerField(null=True, blank=True)
+    max_reps_override = models.PositiveIntegerField(null=True, blank=True)
+
+    class Meta:
+        ordering = ['order']
+
+    def effective_sets(self):
+        return self.sets_override or self.exercise.default_sets
+
+    def effective_min_reps(self):
+        return self.min_reps_override or self.exercise.default_min_reps
+
+    def effective_max_reps(self):
+        return self.max_reps_override or self.exercise.default_max_reps
+
+    def __str__(self):
+        return f'{self.program_day} — {self.exercise.name}'
