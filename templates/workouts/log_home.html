@@ -32,7 +32,7 @@
     <a href="{% url 'gym_program_days' prog.id %}" class="repeat-btn">
       <div>
         <div class="repeat-label">{{ prog.name }}</div>
-        <div class="repeat-meta">{{ prog.days.count }} day{{ prog.days.count|pluralize }}</div>
+        <div class="repeat-meta">{{ prog.days.all|length }} day{{ prog.days.all|length|pluralize }}</div>
       </div>
     </a>
     {% endfor %}

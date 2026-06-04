@@ -1,4 +1,5 @@
 import json
+from types import SimpleNamespace
 
 from django.db import transaction
 from django.db.models import Max, Prefetch
@@ -311,8 +312,7 @@ def program_day_list(request, program_id):
 
 @require_http_methods(['GET'])
 def program_preview(request, day_id):
-    from types import SimpleNamespace
-    day = get_object_or_404(ProgramDay, id=day_id)
+    day = get_object_or_404(ProgramDay, id=day_id, program__is_active=True)
     today = timezone.localdate()
     session_name = f"{today.strftime('%A')} {day.name}"
     program_exercises = (day.exercises
