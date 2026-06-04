@@ -1,0 +1,1196 @@
+[
+  {
+    "model": "workouts.program",
+    "pk": 1,
+    "fields": {
+      "name": "Bro Split",
+      "description": "5-day muscle-group split: Chest / Back / Shoulders / Arms / Legs",
+      "is_active": true
+    }
+  },
+  {
+    "model": "workouts.program",
+    "pk": 2,
+    "fields": {
+      "name": "Full Body 3-Day",
+      "description": "3 full-body sessions per week, balanced compound movements",
+      "is_active": true
+    }
+  },
+  {
+    "model": "workouts.program",
+    "pk": 3,
+    "fields": {
+      "name": "PPL \u2014 Push Pull Legs",
+      "description": "Classic 3-day push/pull/legs split",
+      "is_active": true
+    }
+  },
+  {
+    "model": "workouts.program",
+    "pk": 4,
+    "fields": {
+      "name": "5x5 Stronglift",
+      "description": "Two alternating sessions, 5 sets of 5 reps, barbell focus",
+      "is_active": true
+    }
+  },
+  {
+    "model": "workouts.program",
+    "pk": 5,
+    "fields": {
+      "name": "Upper / Lower",
+      "description": "4-day upper/lower split with A/B variation",
+      "is_active": true
+    }
+  },
+  {
+    "model": "workouts.programday",
+    "pk": 1,
+    "fields": {
+      "program": 1,
+      "name": "Chest",
+      "order": 1
+    }
+  },
+  {
+    "model": "workouts.programday",
+    "pk": 2,
+    "fields": {
+      "program": 1,
+      "name": "Back",
+      "order": 2
+    }
+  },
+  {
+    "model": "workouts.programday",
+    "pk": 3,
+    "fields": {
+      "program": 1,
+      "name": "Shoulders",
+      "order": 3
+    }
+  },
+  {
+    "model": "workouts.programday",
+    "pk": 4,
+    "fields": {
+      "program": 1,
+      "name": "Arms",
+      "order": 4
+    }
+  },
+  {
+    "model": "workouts.programday",
+    "pk": 5,
+    "fields": {
+      "program": 1,
+      "name": "Legs",
+      "order": 5
+    }
+  },
+  {
+    "model": "workouts.programday",
+    "pk": 6,
+    "fields": {
+      "program": 2,
+      "name": "Day A",
+      "order": 1
+    }
+  },
+  {
+    "model": "workouts.programday",
+    "pk": 7,
+    "fields": {
+      "program": 2,
+      "name": "Day B",
+      "order": 2
+    }
+  },
+  {
+    "model": "workouts.programday",
+    "pk": 8,
+    "fields": {
+      "program": 2,
+      "name": "Day C",
+      "order": 3
+    }
+  },
+  {
+    "model": "workouts.programday",
+    "pk": 9,
+    "fields": {
+      "program": 3,
+      "name": "Push",
+      "order": 1
+    }
+  },
+  {
+    "model": "workouts.programday",
+    "pk": 10,
+    "fields": {
+      "program": 3,
+      "name": "Pull",
+      "order": 2
+    }
+  },
+  {
+    "model": "workouts.programday",
+    "pk": 11,
+    "fields": {
+      "program": 3,
+      "name": "Legs",
+      "order": 3
+    }
+  },
+  {
+    "model": "workouts.programday",
+    "pk": 12,
+    "fields": {
+      "program": 4,
+      "name": "Workout A",
+      "order": 1
+    }
+  },
+  {
+    "model": "workouts.programday",
+    "pk": 13,
+    "fields": {
+      "program": 4,
+      "name": "Workout B",
+      "order": 2
+    }
+  },
+  {
+    "model": "workouts.programday",
+    "pk": 14,
+    "fields": {
+      "program": 5,
+      "name": "Upper A",
+      "order": 1
+    }
+  },
+  {
+    "model": "workouts.programday",
+    "pk": 15,
+    "fields": {
+      "program": 5,
+      "name": "Lower A",
+      "order": 2
+    }
+  },
+  {
+    "model": "workouts.programday",
+    "pk": 16,
+    "fields": {
+      "program": 5,
+      "name": "Upper B",
+      "order": 3
+    }
+  },
+  {
+    "model": "workouts.programday",
+    "pk": 17,
+    "fields": {
+      "program": 5,
+      "name": "Lower B",
+      "order": 4
+    }
+  },
+  {
+    "model": "workouts.programexercise",
+    "pk": 1,
+    "fields": {
+      "program_day": 1,
+      "exercise": 1,
+      "order": 1,
+      "sets_override": null,
+      "min_reps_override": null,
+      "max_reps_override": null
+    }
+  },
+  {
+    "model": "workouts.programexercise",
+    "pk": 2,
+    "fields": {
+      "program_day": 1,
+      "exercise": 2,
+      "order": 2,
+      "sets_override": null,
+      "min_reps_override": null,
+      "max_reps_override": null
+    }
+  },
+  {
+    "model": "workouts.programexercise",
+    "pk": 3,
+    "fields": {
+      "program_day": 1,
+      "exercise": 4,
+      "order": 3,
+      "sets_override": null,
+      "min_reps_override": null,
+      "max_reps_override": null
+    }
+  },
+  {
+    "model": "workouts.programexercise",
+    "pk": 4,
+    "fields": {
+      "program_day": 1,
+      "exercise": 5,
+      "order": 4,
+      "sets_override": null,
+      "min_reps_override": null,
+      "max_reps_override": null
+    }
+  },
+  {
+    "model": "workouts.programexercise",
+    "pk": 5,
+    "fields": {
+      "program_day": 2,
+      "exercise": 9,
+      "order": 1,
+      "sets_override": null,
+      "min_reps_override": null,
+      "max_reps_override": null
+    }
+  },
+  {
+    "model": "workouts.programexercise",
+    "pk": 6,
+    "fields": {
+      "program_day": 2,
+      "exercise": 11,
+      "order": 2,
+      "sets_override": null,
+      "min_reps_override": null,
+      "max_reps_override": null
+    }
+  },
+  {
+    "model": "workouts.programexercise",
+    "pk": 7,
+    "fields": {
+      "program_day": 2,
+      "exercise": 13,
+      "order": 3,
+      "sets_override": null,
+      "min_reps_override": null,
+      "max_reps_override": null
+    }
+  },
+  {
+    "model": "workouts.programexercise",
+    "pk": 8,
+    "fields": {
+      "program_day": 2,
+      "exercise": 12,
+      "order": 4,
+      "sets_override": null,
+      "min_reps_override": null,
+      "max_reps_override": null
+    }
+  },
+  {
+    "model": "workouts.programexercise",
+    "pk": 9,
+    "fields": {
+      "program_day": 2,
+      "exercise": 14,
+      "order": 5,
+      "sets_override": null,
+      "min_reps_override": null,
+      "max_reps_override": null
+    }
+  },
+  {
+    "model": "workouts.programexercise",
+    "pk": 10,
+    "fields": {
+      "program_day": 3,
+      "exercise": 3,
+      "order": 1,
+      "sets_override": null,
+      "min_reps_override": null,
+      "max_reps_override": null
+    }
+  },
+  {
+    "model": "workouts.programexercise",
+    "pk": 11,
+    "fields": {
+      "program_day": 3,
+      "exercise": 6,
+      "order": 2,
+      "sets_override": null,
+      "min_reps_override": null,
+      "max_reps_override": null
+    }
+  },
+  {
+    "model": "workouts.programexercise",
+    "pk": 12,
+    "fields": {
+      "program_day": 3,
+      "exercise": 26,
+      "order": 3,
+      "sets_override": null,
+      "min_reps_override": null,
+      "max_reps_override": null
+    }
+  },
+  {
+    "model": "workouts.programexercise",
+    "pk": 13,
+    "fields": {
+      "program_day": 3,
+      "exercise": 14,
+      "order": 4,
+      "sets_override": null,
+      "min_reps_override": null,
+      "max_reps_override": null
+    }
+  },
+  {
+    "model": "workouts.programexercise",
+    "pk": 14,
+    "fields": {
+      "program_day": 4,
+      "exercise": 7,
+      "order": 1,
+      "sets_override": null,
+      "min_reps_override": null,
+      "max_reps_override": null
+    }
+  },
+  {
+    "model": "workouts.programexercise",
+    "pk": 15,
+    "fields": {
+      "program_day": 4,
+      "exercise": 27,
+      "order": 2,
+      "sets_override": null,
+      "min_reps_override": null,
+      "max_reps_override": null
+    }
+  },
+  {
+    "model": "workouts.programexercise",
+    "pk": 16,
+    "fields": {
+      "program_day": 4,
+      "exercise": 28,
+      "order": 3,
+      "sets_override": null,
+      "min_reps_override": null,
+      "max_reps_override": null
+    }
+  },
+  {
+    "model": "workouts.programexercise",
+    "pk": 17,
+    "fields": {
+      "program_day": 4,
+      "exercise": 15,
+      "order": 4,
+      "sets_override": null,
+      "min_reps_override": null,
+      "max_reps_override": null
+    }
+  },
+  {
+    "model": "workouts.programexercise",
+    "pk": 18,
+    "fields": {
+      "program_day": 4,
+      "exercise": 16,
+      "order": 5,
+      "sets_override": null,
+      "min_reps_override": null,
+      "max_reps_override": null
+    }
+  },
+  {
+    "model": "workouts.programexercise",
+    "pk": 19,
+    "fields": {
+      "program_day": 4,
+      "exercise": 17,
+      "order": 6,
+      "sets_override": null,
+      "min_reps_override": null,
+      "max_reps_override": null
+    }
+  },
+  {
+    "model": "workouts.programexercise",
+    "pk": 20,
+    "fields": {
+      "program_day": 5,
+      "exercise": 18,
+      "order": 1,
+      "sets_override": null,
+      "min_reps_override": null,
+      "max_reps_override": null
+    }
+  },
+  {
+    "model": "workouts.programexercise",
+    "pk": 21,
+    "fields": {
+      "program_day": 5,
+      "exercise": 19,
+      "order": 2,
+      "sets_override": null,
+      "min_reps_override": null,
+      "max_reps_override": null
+    }
+  },
+  {
+    "model": "workouts.programexercise",
+    "pk": 22,
+    "fields": {
+      "program_day": 5,
+      "exercise": 20,
+      "order": 3,
+      "sets_override": null,
+      "min_reps_override": null,
+      "max_reps_override": null
+    }
+  },
+  {
+    "model": "workouts.programexercise",
+    "pk": 23,
+    "fields": {
+      "program_day": 5,
+      "exercise": 21,
+      "order": 4,
+      "sets_override": null,
+      "min_reps_override": null,
+      "max_reps_override": null
+    }
+  },
+  {
+    "model": "workouts.programexercise",
+    "pk": 24,
+    "fields": {
+      "program_day": 5,
+      "exercise": 22,
+      "order": 5,
+      "sets_override": null,
+      "min_reps_override": null,
+      "max_reps_override": null
+    }
+  },
+  {
+    "model": "workouts.programexercise",
+    "pk": 25,
+    "fields": {
+      "program_day": 5,
+      "exercise": 24,
+      "order": 6,
+      "sets_override": null,
+      "min_reps_override": null,
+      "max_reps_override": null
+    }
+  },
+  {
+    "model": "workouts.programexercise",
+    "pk": 26,
+    "fields": {
+      "program_day": 6,
+      "exercise": 18,
+      "order": 1,
+      "sets_override": null,
+      "min_reps_override": null,
+      "max_reps_override": null
+    }
+  },
+  {
+    "model": "workouts.programexercise",
+    "pk": 27,
+    "fields": {
+      "program_day": 6,
+      "exercise": 1,
+      "order": 2,
+      "sets_override": null,
+      "min_reps_override": null,
+      "max_reps_override": null
+    }
+  },
+  {
+    "model": "workouts.programexercise",
+    "pk": 28,
+    "fields": {
+      "program_day": 6,
+      "exercise": 9,
+      "order": 3,
+      "sets_override": null,
+      "min_reps_override": null,
+      "max_reps_override": null
+    }
+  },
+  {
+    "model": "workouts.programexercise",
+    "pk": 29,
+    "fields": {
+      "program_day": 6,
+      "exercise": 3,
+      "order": 4,
+      "sets_override": null,
+      "min_reps_override": null,
+      "max_reps_override": null
+    }
+  },
+  {
+    "model": "workouts.programexercise",
+    "pk": 30,
+    "fields": {
+      "program_day": 6,
+      "exercise": 20,
+      "order": 5,
+      "sets_override": null,
+      "min_reps_override": null,
+      "max_reps_override": null
+    }
+  },
+  {
+    "model": "workouts.programexercise",
+    "pk": 31,
+    "fields": {
+      "program_day": 7,
+      "exercise": 19,
+      "order": 1,
+      "sets_override": null,
+      "min_reps_override": null,
+      "max_reps_override": null
+    }
+  },
+  {
+    "model": "workouts.programexercise",
+    "pk": 32,
+    "fields": {
+      "program_day": 7,
+      "exercise": 2,
+      "order": 2,
+      "sets_override": null,
+      "min_reps_override": null,
+      "max_reps_override": null
+    }
+  },
+  {
+    "model": "workouts.programexercise",
+    "pk": 33,
+    "fields": {
+      "program_day": 7,
+      "exercise": 11,
+      "order": 3,
+      "sets_override": null,
+      "min_reps_override": null,
+      "max_reps_override": null
+    }
+  },
+  {
+    "model": "workouts.programexercise",
+    "pk": 34,
+    "fields": {
+      "program_day": 7,
+      "exercise": 6,
+      "order": 4,
+      "sets_override": null,
+      "min_reps_override": null,
+      "max_reps_override": null
+    }
+  },
+  {
+    "model": "workouts.programexercise",
+    "pk": 35,
+    "fields": {
+      "program_day": 7,
+      "exercise": 21,
+      "order": 5,
+      "sets_override": null,
+      "min_reps_override": null,
+      "max_reps_override": null
+    }
+  },
+  {
+    "model": "workouts.programexercise",
+    "pk": 36,
+    "fields": {
+      "program_day": 8,
+      "exercise": 18,
+      "order": 1,
+      "sets_override": null,
+      "min_reps_override": null,
+      "max_reps_override": null
+    }
+  },
+  {
+    "model": "workouts.programexercise",
+    "pk": 37,
+    "fields": {
+      "program_day": 8,
+      "exercise": 13,
+      "order": 2,
+      "sets_override": null,
+      "min_reps_override": null,
+      "max_reps_override": null
+    }
+  },
+  {
+    "model": "workouts.programexercise",
+    "pk": 38,
+    "fields": {
+      "program_day": 8,
+      "exercise": 4,
+      "order": 3,
+      "sets_override": null,
+      "min_reps_override": null,
+      "max_reps_override": null
+    }
+  },
+  {
+    "model": "workouts.programexercise",
+    "pk": 39,
+    "fields": {
+      "program_day": 8,
+      "exercise": 14,
+      "order": 4,
+      "sets_override": null,
+      "min_reps_override": null,
+      "max_reps_override": null
+    }
+  },
+  {
+    "model": "workouts.programexercise",
+    "pk": 40,
+    "fields": {
+      "program_day": 8,
+      "exercise": 23,
+      "order": 5,
+      "sets_override": null,
+      "min_reps_override": null,
+      "max_reps_override": null
+    }
+  },
+  {
+    "model": "workouts.programexercise",
+    "pk": 41,
+    "fields": {
+      "program_day": 9,
+      "exercise": 1,
+      "order": 1,
+      "sets_override": null,
+      "min_reps_override": null,
+      "max_reps_override": null
+    }
+  },
+  {
+    "model": "workouts.programexercise",
+    "pk": 42,
+    "fields": {
+      "program_day": 9,
+      "exercise": 2,
+      "order": 2,
+      "sets_override": null,
+      "min_reps_override": null,
+      "max_reps_override": null
+    }
+  },
+  {
+    "model": "workouts.programexercise",
+    "pk": 43,
+    "fields": {
+      "program_day": 9,
+      "exercise": 3,
+      "order": 3,
+      "sets_override": null,
+      "min_reps_override": null,
+      "max_reps_override": null
+    }
+  },
+  {
+    "model": "workouts.programexercise",
+    "pk": 44,
+    "fields": {
+      "program_day": 9,
+      "exercise": 6,
+      "order": 4,
+      "sets_override": null,
+      "min_reps_override": null,
+      "max_reps_override": null
+    }
+  },
+  {
+    "model": "workouts.programexercise",
+    "pk": 45,
+    "fields": {
+      "program_day": 9,
+      "exercise": 7,
+      "order": 5,
+      "sets_override": null,
+      "min_reps_override": null,
+      "max_reps_override": null
+    }
+  },
+  {
+    "model": "workouts.programexercise",
+    "pk": 46,
+    "fields": {
+      "program_day": 10,
+      "exercise": 9,
+      "order": 1,
+      "sets_override": null,
+      "min_reps_override": null,
+      "max_reps_override": null
+    }
+  },
+  {
+    "model": "workouts.programexercise",
+    "pk": 47,
+    "fields": {
+      "program_day": 10,
+      "exercise": 11,
+      "order": 2,
+      "sets_override": null,
+      "min_reps_override": null,
+      "max_reps_override": null
+    }
+  },
+  {
+    "model": "workouts.programexercise",
+    "pk": 48,
+    "fields": {
+      "program_day": 10,
+      "exercise": 13,
+      "order": 3,
+      "sets_override": null,
+      "min_reps_override": null,
+      "max_reps_override": null
+    }
+  },
+  {
+    "model": "workouts.programexercise",
+    "pk": 49,
+    "fields": {
+      "program_day": 10,
+      "exercise": 14,
+      "order": 4,
+      "sets_override": null,
+      "min_reps_override": null,
+      "max_reps_override": null
+    }
+  },
+  {
+    "model": "workouts.programexercise",
+    "pk": 50,
+    "fields": {
+      "program_day": 10,
+      "exercise": 15,
+      "order": 5,
+      "sets_override": null,
+      "min_reps_override": null,
+      "max_reps_override": null
+    }
+  },
+  {
+    "model": "workouts.programexercise",
+    "pk": 51,
+    "fields": {
+      "program_day": 11,
+      "exercise": 18,
+      "order": 1,
+      "sets_override": null,
+      "min_reps_override": null,
+      "max_reps_override": null
+    }
+  },
+  {
+    "model": "workouts.programexercise",
+    "pk": 52,
+    "fields": {
+      "program_day": 11,
+      "exercise": 19,
+      "order": 2,
+      "sets_override": null,
+      "min_reps_override": null,
+      "max_reps_override": null
+    }
+  },
+  {
+    "model": "workouts.programexercise",
+    "pk": 53,
+    "fields": {
+      "program_day": 11,
+      "exercise": 20,
+      "order": 3,
+      "sets_override": null,
+      "min_reps_override": null,
+      "max_reps_override": null
+    }
+  },
+  {
+    "model": "workouts.programexercise",
+    "pk": 54,
+    "fields": {
+      "program_day": 11,
+      "exercise": 21,
+      "order": 4,
+      "sets_override": null,
+      "min_reps_override": null,
+      "max_reps_override": null
+    }
+  },
+  {
+    "model": "workouts.programexercise",
+    "pk": 55,
+    "fields": {
+      "program_day": 11,
+      "exercise": 24,
+      "order": 5,
+      "sets_override": null,
+      "min_reps_override": null,
+      "max_reps_override": null
+    }
+  },
+  {
+    "model": "workouts.programexercise",
+    "pk": 56,
+    "fields": {
+      "program_day": 12,
+      "exercise": 18,
+      "order": 1,
+      "sets_override": 5,
+      "min_reps_override": 5,
+      "max_reps_override": 5
+    }
+  },
+  {
+    "model": "workouts.programexercise",
+    "pk": 57,
+    "fields": {
+      "program_day": 12,
+      "exercise": 1,
+      "order": 2,
+      "sets_override": 5,
+      "min_reps_override": 5,
+      "max_reps_override": 5
+    }
+  },
+  {
+    "model": "workouts.programexercise",
+    "pk": 58,
+    "fields": {
+      "program_day": 12,
+      "exercise": 13,
+      "order": 3,
+      "sets_override": 5,
+      "min_reps_override": 5,
+      "max_reps_override": 5
+    }
+  },
+  {
+    "model": "workouts.programexercise",
+    "pk": 59,
+    "fields": {
+      "program_day": 13,
+      "exercise": 18,
+      "order": 1,
+      "sets_override": 5,
+      "min_reps_override": 5,
+      "max_reps_override": 5
+    }
+  },
+  {
+    "model": "workouts.programexercise",
+    "pk": 60,
+    "fields": {
+      "program_day": 13,
+      "exercise": 3,
+      "order": 2,
+      "sets_override": 5,
+      "min_reps_override": 5,
+      "max_reps_override": 5
+    }
+  },
+  {
+    "model": "workouts.programexercise",
+    "pk": 61,
+    "fields": {
+      "program_day": 13,
+      "exercise": 20,
+      "order": 3,
+      "sets_override": 5,
+      "min_reps_override": 5,
+      "max_reps_override": 5
+    }
+  },
+  {
+    "model": "workouts.programexercise",
+    "pk": 62,
+    "fields": {
+      "program_day": 14,
+      "exercise": 1,
+      "order": 1,
+      "sets_override": null,
+      "min_reps_override": null,
+      "max_reps_override": null
+    }
+  },
+  {
+    "model": "workouts.programexercise",
+    "pk": 63,
+    "fields": {
+      "program_day": 14,
+      "exercise": 13,
+      "order": 2,
+      "sets_override": null,
+      "min_reps_override": null,
+      "max_reps_override": null
+    }
+  },
+  {
+    "model": "workouts.programexercise",
+    "pk": 64,
+    "fields": {
+      "program_day": 14,
+      "exercise": 3,
+      "order": 3,
+      "sets_override": null,
+      "min_reps_override": null,
+      "max_reps_override": null
+    }
+  },
+  {
+    "model": "workouts.programexercise",
+    "pk": 65,
+    "fields": {
+      "program_day": 14,
+      "exercise": 9,
+      "order": 4,
+      "sets_override": null,
+      "min_reps_override": null,
+      "max_reps_override": null
+    }
+  },
+  {
+    "model": "workouts.programexercise",
+    "pk": 66,
+    "fields": {
+      "program_day": 14,
+      "exercise": 7,
+      "order": 5,
+      "sets_override": null,
+      "min_reps_override": null,
+      "max_reps_override": null
+    }
+  },
+  {
+    "model": "workouts.programexercise",
+    "pk": 67,
+    "fields": {
+      "program_day": 14,
+      "exercise": 15,
+      "order": 6,
+      "sets_override": null,
+      "min_reps_override": null,
+      "max_reps_override": null
+    }
+  },
+  {
+    "model": "workouts.programexercise",
+    "pk": 68,
+    "fields": {
+      "program_day": 15,
+      "exercise": 18,
+      "order": 1,
+      "sets_override": null,
+      "min_reps_override": null,
+      "max_reps_override": null
+    }
+  },
+  {
+    "model": "workouts.programexercise",
+    "pk": 69,
+    "fields": {
+      "program_day": 15,
+      "exercise": 20,
+      "order": 2,
+      "sets_override": null,
+      "min_reps_override": null,
+      "max_reps_override": null
+    }
+  },
+  {
+    "model": "workouts.programexercise",
+    "pk": 70,
+    "fields": {
+      "program_day": 15,
+      "exercise": 19,
+      "order": 3,
+      "sets_override": null,
+      "min_reps_override": null,
+      "max_reps_override": null
+    }
+  },
+  {
+    "model": "workouts.programexercise",
+    "pk": 71,
+    "fields": {
+      "program_day": 15,
+      "exercise": 21,
+      "order": 4,
+      "sets_override": null,
+      "min_reps_override": null,
+      "max_reps_override": null
+    }
+  },
+  {
+    "model": "workouts.programexercise",
+    "pk": 72,
+    "fields": {
+      "program_day": 15,
+      "exercise": 24,
+      "order": 5,
+      "sets_override": null,
+      "min_reps_override": null,
+      "max_reps_override": null
+    }
+  },
+  {
+    "model": "workouts.programexercise",
+    "pk": 73,
+    "fields": {
+      "program_day": 16,
+      "exercise": 4,
+      "order": 1,
+      "sets_override": null,
+      "min_reps_override": null,
+      "max_reps_override": null
+    }
+  },
+  {
+    "model": "workouts.programexercise",
+    "pk": 74,
+    "fields": {
+      "program_day": 16,
+      "exercise": 12,
+      "order": 2,
+      "sets_override": null,
+      "min_reps_override": null,
+      "max_reps_override": null
+    }
+  },
+  {
+    "model": "workouts.programexercise",
+    "pk": 75,
+    "fields": {
+      "program_day": 16,
+      "exercise": 6,
+      "order": 3,
+      "sets_override": null,
+      "min_reps_override": null,
+      "max_reps_override": null
+    }
+  },
+  {
+    "model": "workouts.programexercise",
+    "pk": 76,
+    "fields": {
+      "program_day": 16,
+      "exercise": 11,
+      "order": 4,
+      "sets_override": null,
+      "min_reps_override": null,
+      "max_reps_override": null
+    }
+  },
+  {
+    "model": "workouts.programexercise",
+    "pk": 77,
+    "fields": {
+      "program_day": 16,
+      "exercise": 28,
+      "order": 5,
+      "sets_override": null,
+      "min_reps_override": null,
+      "max_reps_override": null
+    }
+  },
+  {
+    "model": "workouts.programexercise",
+    "pk": 78,
+    "fields": {
+      "program_day": 16,
+      "exercise": 16,
+      "order": 6,
+      "sets_override": null,
+      "min_reps_override": null,
+      "max_reps_override": null
+    }
+  },
+  {
+    "model": "workouts.programexercise",
+    "pk": 79,
+    "fields": {
+      "program_day": 17,
+      "exercise": 20,
+      "order": 1,
+      "sets_override": null,
+      "min_reps_override": null,
+      "max_reps_override": null
+    }
+  },
+  {
+    "model": "workouts.programexercise",
+    "pk": 80,
+    "fields": {
+      "program_day": 17,
+      "exercise": 23,
+      "order": 2,
+      "sets_override": null,
+      "min_reps_override": null,
+      "max_reps_override": null
+    }
+  },
+  {
+    "model": "workouts.programexercise",
+    "pk": 81,
+    "fields": {
+      "program_day": 17,
+      "exercise": 22,
+      "order": 3,
+      "sets_override": null,
+      "min_reps_override": null,
+      "max_reps_override": null
+    }
+  },
+  {
+    "model": "workouts.programexercise",
+    "pk": 82,
+    "fields": {
+      "program_day": 17,
+      "exercise": 21,
+      "order": 4,
+      "sets_override": null,
+      "min_reps_override": null,
+      "max_reps_override": null
+    }
+  },
+  {
+    "model": "workouts.programexercise",
+    "pk": 83,
+    "fields": {
+      "program_day": 17,
+      "exercise": 24,
+      "order": 5,
+      "sets_override": null,
+      "min_reps_override": null,
+      "max_reps_override": null
+    }
+  }
+]
