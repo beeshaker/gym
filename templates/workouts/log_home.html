@@ -26,13 +26,14 @@
   {% endif %}
 
   {% if programs %}
-  <div class="programs-section">
-    <div class="repeat-divider">Programs</div>
+  <div class="program-section">
+    <div class="program-divider">📋 Programs</div>
     {% for prog in programs %}
-    <a href="{% url 'gym_program_days' prog.id %}" class="repeat-btn">
+    <a href="{% url 'gym_program_days' prog.id %}" class="program-btn">
+      <span class="program-icon">📋</span>
       <div>
-        <div class="repeat-label">{{ prog.name }}</div>
-        <div class="repeat-meta">{{ prog.days.all|length }} day{{ prog.days.all|length|pluralize }}</div>
+        <div class="program-name">{{ prog.name }}</div>
+        <div class="program-meta">{{ prog.description }}</div>
       </div>
     </a>
     {% endfor %}

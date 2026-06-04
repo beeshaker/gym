@@ -1,4 +1,133 @@
 {% extends 'base.html' %}
+{% block title %}{{ session_name }} — Gym AI{% endblock %}
+
 {% block content %}
-{% for item in exercises %}{{ item.exercise.name }}{% endfor %}
+<div class="page-header">
+  <h1 class="page-title">{{ session_name }}</h1>
+  <p class="page-sub">Adjust or swap exercises, then start</p>
+</div>
+
+<form method="post" action="{% url 'gym_program_start' %}">
+  {% csrf_token %}
+  <input type="hidden" name="name" value="{{ session_name }}">
+
+  {% for item in exercises %}
+  <div class="we-card" data-exercise-id="{{ item.exercise.id }}">
+    <div class="we-name" style="display:flex;justify-content:space-between;align-items:center">
+      <span class="we-name-text">
+        {{ item.exercise.name }}
+        {% if item.rec.action == 'increase' %}
+        <span class="coach-badge increase">▲ Increase</span>
+        {% elif item.rec.action == 'hold' %}
+        <span class="coach-badge hold">→ Hold</span>
+        {% elif item.rec.action == 'deload' %}
+        <span class="coach-badge deload">▽ Back off</span>
+        {% else %}
+        <span class="coach-badge start">First time</span>
+        {% endif %}
+      </span>
+      <button type="button" class="swap-btn" data-exercise-id="{{ item.exercise.id }}">⇄ Swap</button>
+    </div>
+    <div class="we-meta we-meta-text">{{ item.exercise.get_category_display }} · {{ item.exercise.get_equipment_display }}</div>
+    <input type="hidden" name="exercise_id" value="{{ item.exercise.id }}">
+    {% for s in item.sets %}
+    <div class="preview-set-row">
+      <span class="preview-set-label">Set {{ s.n }}</span>
+      <input type="number" step="0.5" min="0"
+             name="weight_{{ item.exercise.id }}_{{ s.n }}"
+             value="{{ s.weight }}" class="preview-input">
+      <span class="preview-sep">kg ×</span>
+      <input type="number" min="1"
+             name="reps_{{ item.exercise.id }}_{{ s.n }}"
+             value="{{ s.reps }}" class="preview-input">
+      <span class="preview-sep">reps</span>
+    </div>
+    {% endfor %}
+    <div class="swap-panel" style="display:none">
+      <div class="swap-panel-label">⇄ Alternatives — same muscles, different kit</div>
+      <div class="swap-options-list"></div>
+    </div>
+  </div>
+  {% endfor %}
+
+  <button type="submit" class="btn btn-primary" style="margin-top:8px">▶ Start Session</button>
+</form>
+{% endblock %}
+
+{% block scripts %}
+<script>
+const SWAP_URL_TPL = "{% url 'gym_program_swap' 0 %}";
+
+function getSwapUrl(exerciseId) {
+  return SWAP_URL_TPL.replace('/0/', '/' + exerciseId + '/');
+}
+
+document.querySelectorAll('.swap-btn').forEach(function (btn) {
+  btn.addEventListener('click', function () {
+    const card = btn.closest('.we-card');
+    const panel = card.querySelector('.swap-panel');
+    const exerciseId = card.getAttribute('data-exercise-id');
+
+    if (panel.style.display !== 'none') {
+      panel.style.display = 'none';
+      return;
+    }
+
+    fetch(getSwapUrl(exerciseId))
+      .then(function (r) { return r.json(); })
+      .then(function (data) {
+        const list = panel.querySelector('.swap-options-list');
+        list.innerHTML = '';
+        if (!data.alternatives || data.alternatives.length === 0) {
+          list.innerHTML = '<p style="font-size:11px;color:var(--text-sec)">No alternatives found.</p>';
+        } else {
+          data.alternatives.forEach(function (alt) {
+            const div = document.createElement('div');
+            div.className = 'swap-option';
+            div.innerHTML =
+              '<div><div class="swap-option-name">' + alt.name + '</div>' +
+              '<div class="swap-option-meta">' + alt.equipment + ' · ' + alt.movement_type + '</div></div>' +
+              '<button type="button" class="swap-use-btn" data-id="' + alt.id + '" data-name="' + alt.name + '" data-eq="' + alt.equipment + ' · ' + alt.movement_type + '">Use</button>';
+            list.appendChild(div);
+          });
+          list.querySelectorAll('.swap-use-btn').forEach(function (useBtn) {
+            useBtn.addEventListener('click', function () {
+              const newId = useBtn.getAttribute('data-id');
+              const newName = useBtn.getAttribute('data-name');
+              const newMeta = useBtn.getAttribute('data-eq');
+              const oldId = exerciseId;
+
+              card.setAttribute('data-exercise-id', newId);
+              card.querySelector('input[name="exercise_id"]').value = newId;
+
+              card.querySelectorAll('input[name^="weight_' + oldId + '_"]').forEach(function (inp) {
+                inp.name = inp.name.replace('weight_' + oldId + '_', 'weight_' + newId + '_');
+              });
+              card.querySelectorAll('input[name^="reps_' + oldId + '_"]').forEach(function (inp) {
+                inp.name = inp.name.replace('reps_' + oldId + '_', 'reps_' + newId + '_');
+              });
+
+              btn.setAttribute('data-exercise-id', newId);
+
+              const nameSpan = card.querySelector('.we-name-text');
+              const badge = nameSpan.querySelector('span');
+              nameSpan.textContent = newName + ' ';
+              if (badge) nameSpan.appendChild(badge);
+
+              card.querySelector('.we-meta-text').textContent = newMeta;
+
+              panel.style.display = 'none';
+            });
+          });
+        }
+        panel.style.display = 'block';
+      })
+      .catch(function () {
+        panel.querySelector('.swap-options-list').innerHTML =
+          '<p style="font-size:11px;color:#EF4444">Failed to load alternatives.</p>';
+        panel.style.display = 'block';
+      });
+  });
+});
+</script>
 {% endblock %}

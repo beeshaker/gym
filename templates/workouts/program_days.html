@@ -1,4 +1,20 @@
 {% extends 'base.html' %}
+{% block title %}{{ program.name }} — Gym AI{% endblock %}
+
 {% block content %}
-{% for day in days %}{{ day.name }}{% endfor %}
+<div class="page-header">
+  <h1 class="page-title">{{ program.name }}</h1>
+  <p class="page-sub">{{ program.description }}</p>
+</div>
+
+{% for day in days %}
+<a href="{% url 'gym_program_preview' day.id %}" class="program-btn" style="margin-bottom:10px">
+  <span class="program-icon">💪</span>
+  <div>
+    <div class="program-name">{{ day.name }}</div>
+  </div>
+</a>
+{% empty %}
+<p class="empty-state">No days configured for this program.</p>
+{% endfor %}
 {% endblock %}
