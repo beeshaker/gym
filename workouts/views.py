@@ -11,7 +11,7 @@ from django.views.decorators.http import require_http_methods
 
 from .models import Exercise, Program, ProgramDay, ProgramExercise, WorkoutExercise, WorkoutSession, WorkoutSet
 from .nl_parser import NLParseError, parse
-from .coach import CoachError, get_ollama_tips, recommend
+from .coach import CoachError, get_ollama_tips, get_program_chat_reply, recommend
 from .repeat import get_last_sessions_by_category, get_repeat_preview
 
 
@@ -386,3 +386,38 @@ def program_start(request):
     except ValueError:
         return redirect('gym_log_home')
     return redirect('gym_active_session', session_id=session.id)
+
+
+@require_http_methods(['POST'])
+def program_chat(request, day_id):
+    day = get_object_or_404(
+        ProgramDay.objects.select_related('program'),
+        id=day_id,
+        program__is_active=True,
+    )
+    try:
+        body = json.loads(request.body)
+    except (json.JSONDecodeError, ValueError):
+        return JsonResponse({'error': 'invalid JSON'}, status=400)
+    message = body.get('message', '').strip()
+    if not message:
+        return JsonResponse({'error': 'message required'}, status=400)
+    history = body.get('history', [])
+
+    program_exercises = day.exercises.select_related('exercise').order_by('order')
+    context_lines = [
+        f'- {pe.exercise.name} ({pe.exercise.get_movement_type_display()}, '
+        f'{pe.exercise.get_equipment_display()})'
+        for pe in program_exercises
+    ]
+
+    try:
+        reply = get_program_chat_reply(
+            day.program.name, day.name, context_lines, history, message
+        )
+    except CoachError as e:
+        return JsonResponse(
+            {'error': str(e) or 'Coach unavailable — try again'},
+            status=422,
+        )
+    return JsonResponse({'reply': reply})

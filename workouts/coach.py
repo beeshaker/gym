@@ -9,6 +9,7 @@ class CoachError(Exception):
 
 
 OLLAMA_URL = 'http://localhost:11434/api/generate'
+OLLAMA_CHAT_URL = 'http://localhost:11434/api/chat'
 OLLAMA_MODEL = 'qwen2.5:1.5b'
 OLLAMA_TIMEOUT = 30
 
@@ -111,3 +112,49 @@ def get_ollama_tips(exercises_with_recs: list) -> dict:
     if 'tips' not in data:
         raise CoachError('Ollama response missing tips key')
     return data['tips']
+
+
+def get_program_chat_reply(program_name, day_name, context_lines, history, question):
+    """
+    program_name: str
+    day_name: str
+    context_lines: list of str, one per exercise
+    history: list of {role, content} dicts from prior turns
+    question: str — the user's latest message
+    Returns: reply string
+    Raises CoachError on any Ollama failure.
+    """
+    system_content = (
+        f'You are a strength training coach. '
+        f'The user is about to start {program_name} — {day_name}. '
+        f"Today's exercises:\n" + '\n'.join(context_lines) + '\n\n'
+        'Answer questions about rest periods, exercise swaps, and progressive overload. '
+        'Be concise and practical. Use plain text, no markdown.'
+    )
+    messages = [{'role': 'system', 'content': system_content}]
+    for turn in history:
+        if turn.get('role') in ('user', 'assistant') and turn.get('content'):
+            messages.append({'role': turn['role'], 'content': str(turn['content'])})
+    messages.append({'role': 'user', 'content': question})
+
+    try:
+        resp = requests.post(
+            OLLAMA_CHAT_URL,
+            json={'model': OLLAMA_MODEL, 'messages': messages, 'stream': False},
+            timeout=OLLAMA_TIMEOUT,
+        )
+        resp.raise_for_status()
+    except requests.exceptions.Timeout:
+        raise CoachError('Ollama timed out')
+    except requests.exceptions.RequestException as e:
+        raise CoachError(f'Ollama request failed: {e}')
+
+    try:
+        data = resp.json()
+        reply = data['message']['content']
+    except (KeyError, ValueError, TypeError):
+        raise CoachError('Ollama returned invalid response')
+
+    if not reply:
+        raise CoachError('Ollama returned empty reply')
+    return reply

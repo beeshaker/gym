@@ -27,6 +27,7 @@ urlpatterns = [
     path('programs/<int:program_id>/', workout_views.program_day_list, name='gym_program_days'),
     path('programs/<int:day_id>/preview/', workout_views.program_preview, name='gym_program_preview'),
     path('programs/swap/<int:exercise_id>/', workout_views.program_swap_options, name='gym_program_swap'),
+    path('programs/<int:day_id>/chat/', workout_views.program_chat, name='gym_program_chat'),
     # History
     path('history/', workout_views.history, name='gym_history'),
     path('history/<int:session_id>/', workout_views.session_detail, name='gym_session_detail'),
