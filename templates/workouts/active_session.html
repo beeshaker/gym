@@ -103,10 +103,17 @@
   + Add Exercise
 </button>
 
-<form method="post" action="{% url 'gym_finish_session' session.id %}">
-  {% csrf_token %}
-  <button type="submit" class="btn btn-danger">Finish Workout</button>
-</form>
+<div style="display:flex;gap:8px;margin-top:4px">
+  <form method="post" action="{% url 'gym_finish_session' session.id %}">
+    {% csrf_token %}
+    <button type="submit" class="btn btn-danger">Finish Workout</button>
+  </form>
+  <form method="post" action="{% url 'gym_cancel_session' session.id %}"
+        onsubmit="return confirm('Cancel session? All logged data will be lost.')">
+    {% csrf_token %}
+    <button type="submit" class="btn btn-secondary">✕ Cancel</button>
+  </form>
+</div>
 
 <!-- Exercise picker -->
 <div class="picker-overlay" id="picker-overlay">

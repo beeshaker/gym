@@ -24,4 +24,10 @@
 {% empty %}
 <p class="empty-state">No exercises in this session</p>
 {% endfor %}
+
+<form method="post" action="{% url 'gym_delete_session' session.id %}" style="margin-top:24px"
+      onsubmit="return confirm('Delete this session? This cannot be undone.')">
+  {% csrf_token %}
+  <button type="submit" class="btn btn-secondary" style="color:#EF4444">Delete Session</button>
+</form>
 {% endblock %}

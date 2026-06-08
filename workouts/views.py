@@ -180,6 +180,20 @@ def finish_session(request, session_id):
     return redirect('gym_history')
 
 
+@require_http_methods(['POST'])
+def cancel_session(request, session_id):
+    session = get_object_or_404(WorkoutSession, id=session_id, status='active')
+    session.delete()
+    return redirect('gym_log_home')
+
+
+@require_http_methods(['POST'])
+def delete_session(request, session_id):
+    session = get_object_or_404(WorkoutSession, id=session_id)
+    session.delete()
+    return redirect('gym_history')
+
+
 def history(request):
     exercises_qs = WorkoutExercise.objects.select_related('exercise').annotate(
         max_weight=Max('sets__weight_kg')
