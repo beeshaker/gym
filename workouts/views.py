@@ -3,8 +3,9 @@ from types import SimpleNamespace
 
 from django.db import transaction
 from django.db.models import Max, Prefetch
-from django.http import Http404, JsonResponse
+from django.http import Http404, HttpResponseRedirect, JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
+from django.urls import reverse
 from django.utils import timezone
 from django.views.decorators.http import require_http_methods
 
@@ -63,8 +64,15 @@ def _create_session_from_form(request):
                 exercise = Exercise.objects.get(id=ex_id, is_active=True)
             except Exercise.DoesNotExist:
                 continue
+            try:
+                rest_val = int(request.POST.get(f'rest_{ex_id}', ''))
+                if rest_val <= 0:
+                    rest_val = None
+            except (ValueError, TypeError):
+                rest_val = None
             we = WorkoutExercise.objects.create(
-                session=session, exercise=exercise, order=order
+                session=session, exercise=exercise, order=order,
+                planned_rest_seconds=rest_val,
             )
             n = 1
             while True:
@@ -148,7 +156,8 @@ def add_set(request, session_id, we_id):
         return redirect('gym_active_session', session_id=session.id)
     set_number = we.sets.count() + 1
     WorkoutSet.objects.create(workout_exercise=we, set_number=set_number, weight_kg=weight_kg, reps=reps)
-    return redirect('gym_active_session', session_id=session.id)
+    url = reverse('gym_active_session', kwargs={'session_id': session.id})
+    return HttpResponseRedirect(f'{url}?timer={we_id}')
 
 
 @require_http_methods(['POST'])
