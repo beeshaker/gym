@@ -12,7 +12,7 @@
   <input type="hidden" name="name" value="{{ session_name }}">
 
   {% for item in exercises %}
-  <div class="we-card" data-exercise-id="{{ item.exercise.id }}">
+  <div class="we-card" data-exercise-id="{{ item.exercise.id }}" data-movement-type="{{ item.exercise.movement_type }}">
     <div class="we-name" style="display:flex;justify-content:space-between;align-items:center">
       <span class="we-name-text">
         {{ item.exercise.name }}
@@ -47,11 +47,34 @@
       <div class="swap-panel-label">⇄ Alternatives — same muscles, different kit</div>
       <div class="swap-options-list"></div>
     </div>
+    <div class="rest-row">
+      <span class="rest-row-label">Rest:</span>
+      <button type="button" class="rest-preset-btn" data-seconds="60">60s</button>
+      <button type="button" class="rest-preset-btn" data-seconds="90">90s</button>
+      <button type="button" class="rest-preset-btn" data-seconds="120">2min</button>
+      <button type="button" class="rest-preset-btn" data-seconds="180">3min</button>
+    </div>
+    <input type="hidden" name="rest_{{ item.exercise.id }}" class="rest-hidden" value="">
   </div>
   {% endfor %}
 
   <button type="submit" class="btn btn-primary" style="margin-top:8px">▶ Start Session</button>
 </form>
+
+<button type="button" class="coach-bubble" id="coach-bubble-btn">✦ Ask Coach</button>
+
+<div class="coach-overlay" id="coach-overlay">
+  <div class="coach-overlay-header">
+    <span>Coach — {{ day.name }}</span>
+    <button type="button" class="coach-overlay-close" id="coach-overlay-close">✕</button>
+  </div>
+  <div class="coach-chat-history" id="coach-chat-history"></div>
+  <div class="coach-chat-input-row">
+    <input type="text" class="coach-chat-input" id="coach-chat-input"
+           placeholder="Ask about rest, swaps, overload…">
+    <button type="button" class="coach-send-btn" id="coach-send-btn">Send</button>
+  </div>
+</div>
 {% endblock %}
 
 {% block scripts %}
@@ -148,5 +171,99 @@ document.querySelectorAll('.swap-btn').forEach(function (btn) {
       });
   });
 });
+</script>
+<script>
+// ── Rest presets ─────────────────────────────────────────────────
+const REST_DEFAULTS = { compound: 180, isolation: 90, cardio: 60 };
+
+document.querySelectorAll('.we-card').forEach(function (card) {
+  const mt = card.getAttribute('data-movement-type');
+  const def = REST_DEFAULTS[mt] || 90;
+  const btn = card.querySelector('.rest-preset-btn[data-seconds="' + def + '"]');
+  if (btn) {
+    btn.classList.add('active');
+    card.querySelector('.rest-hidden').value = def;
+  }
+});
+
+document.querySelectorAll('.rest-preset-btn').forEach(function (btn) {
+  btn.addEventListener('click', function () {
+    const card = btn.closest('.we-card');
+    card.querySelectorAll('.rest-preset-btn').forEach(function (b) {
+      b.classList.remove('active');
+    });
+    btn.classList.add('active');
+    card.querySelector('.rest-hidden').value = btn.getAttribute('data-seconds');
+  });
+});
+
+// ── Coach chat overlay ───────────────────────────────────────────
+const CHAT_URL = "{% url 'gym_program_chat' day.id %}";
+const CSRF_TOKEN = '{{ csrf_token }}';
+let chatHistory = [];
+
+document.getElementById('coach-bubble-btn').addEventListener('click', function () {
+  document.getElementById('coach-overlay').classList.add('open');
+  document.getElementById('coach-chat-input').focus();
+});
+
+document.getElementById('coach-overlay-close').addEventListener('click', function () {
+  document.getElementById('coach-overlay').classList.remove('open');
+  chatHistory = [];
+  document.getElementById('coach-chat-history').innerHTML = '';
+});
+
+function appendMsg(text, role) {
+  const div = document.createElement('div');
+  div.className = role === 'user' ? 'coach-msg-user' : 'coach-msg-ai';
+  div.textContent = text;
+  const history = document.getElementById('coach-chat-history');
+  history.appendChild(div);
+  history.scrollTop = history.scrollHeight;
+  return div;
+}
+
+document.getElementById('coach-send-btn').addEventListener('click', sendChat);
+document.getElementById('coach-chat-input').addEventListener('keydown', function (e) {
+  if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendChat(); }
+});
+
+function sendChat() {
+  const input = document.getElementById('coach-chat-input');
+  const sendBtn = document.getElementById('coach-send-btn');
+  const message = input.value.trim();
+  if (!message) return;
+
+  appendMsg(message, 'user');
+  chatHistory.push({ role: 'user', content: message });
+  input.value = '';
+  sendBtn.textContent = '…';
+  sendBtn.disabled = true;
+
+  fetch(CHAT_URL, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', 'X-CSRFToken': CSRF_TOKEN },
+    body: JSON.stringify({ message: message, history: chatHistory.slice(0, -1) }),
+  })
+    .then(function (r) { return r.json().then(function (d) { return { ok: r.ok, data: d }; }); })
+    .then(function (res) {
+      sendBtn.textContent = 'Send';
+      sendBtn.disabled = false;
+      if (!res.ok) {
+        const el = appendMsg(res.data.error || 'Coach unavailable — try again', 'ai');
+        el.classList.add('error');
+        return;
+      }
+      const reply = res.data.reply || '';
+      appendMsg(reply, 'ai');
+      chatHistory.push({ role: 'assistant', content: reply });
+    })
+    .catch(function () {
+      sendBtn.textContent = 'Send';
+      sendBtn.disabled = false;
+      const el = appendMsg('Request failed — check your connection', 'ai');
+      el.classList.add('error');
+    });
+}
 </script>
 {% endblock %}
