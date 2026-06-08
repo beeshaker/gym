@@ -12,7 +12,7 @@
   <input type="hidden" name="name" value="{{ session_name }}">
 
   {% for item in exercises %}
-  <div class="we-card" data-exercise-id="{{ item.exercise.id }}" data-movement-type="{{ item.exercise.movement_type }}">
+  <div class="we-card" data-exercise-id="{{ item.exercise.id }}" data-movement-type="{{ item.exercise.movement_type }}" data-exercise-name="{{ item.exercise.name }}">
     <div class="we-name" style="display:flex;justify-content:space-between;align-items:center">
       <span class="we-name-text">
         {{ item.exercise.name }}
@@ -41,6 +41,7 @@
              name="reps_{{ item.exercise.id }}_{{ s.n }}"
              value="{{ s.reps }}" class="preview-input">
       <span class="preview-sep">reps</span>
+      <button type="button" class="set-check preview-set-check">✓</button>
     </div>
     {% endfor %}
     <div class="swap-panel" style="display:none">
@@ -74,6 +75,19 @@
            placeholder="Ask about rest, swaps, overload…">
     <button type="button" class="coach-send-btn" id="coach-send-btn">Send</button>
   </div>
+</div>
+
+<!-- Rest timer overlay -->
+<div class="timer-overlay" id="timer-overlay" style="display:none">
+  <div class="timer-exercise-name" id="timer-exercise-name"></div>
+  <div class="timer-countdown" id="timer-countdown">0:00</div>
+  <div class="timer-presets">
+    <button type="button" class="timer-preset-btn" data-seconds="60">1 min</button>
+    <button type="button" class="timer-preset-btn" data-seconds="90">90 s</button>
+    <button type="button" class="timer-preset-btn" data-seconds="120">2 min</button>
+    <button type="button" class="timer-preset-btn" data-seconds="180">3 min</button>
+  </div>
+  <button type="button" class="timer-skip-btn" id="timer-skip">Skip</button>
 </div>
 {% endblock %}
 
@@ -265,5 +279,60 @@ function sendChat() {
       el.classList.add('error');
     });
 }
+</script>
+<script>
+// ── Preview rest timer ──────────────────────────────────────────
+let timerInterval = null;
+let timerRemaining = 0;
+
+function fmtTime(s) {
+  const m = Math.floor(s / 60);
+  const sec = s % 60;
+  return m + ':' + (sec < 10 ? '0' : '') + sec;
+}
+
+function startTimer(exerciseName, seconds) {
+  clearInterval(timerInterval);
+  timerRemaining = seconds;
+  document.getElementById('timer-exercise-name').textContent = 'Resting after ' + exerciseName;
+  document.getElementById('timer-countdown').textContent = fmtTime(timerRemaining);
+  document.getElementById('timer-overlay').style.display = 'flex';
+  timerInterval = setInterval(function () {
+    timerRemaining -= 1;
+    document.getElementById('timer-countdown').textContent = fmtTime(timerRemaining);
+    if (timerRemaining <= 0) {
+      clearInterval(timerInterval);
+      document.getElementById('timer-overlay').style.display = 'none';
+      if (navigator.vibrate) { navigator.vibrate([200, 100, 200]); }
+    }
+  }, 1000);
+}
+
+function stopTimer() {
+  clearInterval(timerInterval);
+  document.getElementById('timer-overlay').style.display = 'none';
+}
+
+document.getElementById('timer-skip').addEventListener('click', stopTimer);
+
+document.querySelectorAll('.timer-preset-btn').forEach(function (btn) {
+  btn.addEventListener('click', function () {
+    const name = document.getElementById('timer-exercise-name').textContent.replace('Resting after ', '');
+    startTimer(name, parseInt(btn.getAttribute('data-seconds'), 10));
+  });
+});
+
+document.querySelectorAll('.preview-set-check').forEach(function (btn) {
+  btn.addEventListener('click', function () {
+    const card = btn.closest('.we-card');
+    const exerciseName = card.getAttribute('data-exercise-name');
+    const restHidden = card.querySelector('.rest-hidden');
+    let seconds = restHidden ? parseInt(restHidden.value, 10) : 0;
+    if (!seconds || isNaN(seconds)) {
+      seconds = REST_DEFAULTS[card.getAttribute('data-movement-type')] || 90;
+    }
+    startTimer(exerciseName, seconds);
+  });
+});
 </script>
 {% endblock %}
