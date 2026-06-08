@@ -74,9 +74,10 @@ class WorkoutSession(models.Model):
 
 
 class WorkoutExercise(models.Model):
-    session  = models.ForeignKey(WorkoutSession, on_delete=models.CASCADE, related_name='workout_exercises')
-    exercise = models.ForeignKey(Exercise, on_delete=models.PROTECT, related_name='workout_exercises')
-    order    = models.PositiveIntegerField(default=0)
+    session               = models.ForeignKey(WorkoutSession, on_delete=models.CASCADE, related_name='workout_exercises')
+    exercise              = models.ForeignKey(Exercise, on_delete=models.PROTECT, related_name='workout_exercises')
+    order                 = models.PositiveIntegerField(default=0)
+    planned_rest_seconds  = models.PositiveIntegerField(null=True, blank=True)
 
     class Meta:
         ordering = ['order']
