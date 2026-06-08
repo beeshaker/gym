@@ -403,6 +403,9 @@ def program_chat(request, day_id):
     if not message:
         return JsonResponse({'error': 'message required'}, status=400)
     history = body.get('history', [])
+    if len(message) > 2000:
+        return JsonResponse({'error': 'message too long'}, status=400)
+    history = history[-20:] if isinstance(history, list) else []
 
     program_exercises = day.exercises.select_related('exercise').order_by('order')
     context_lines = [
