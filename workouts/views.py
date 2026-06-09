@@ -172,6 +172,34 @@ def delete_set(request, session_id, we_id, set_id):
 
 
 @require_http_methods(['POST'])
+def edit_set(request, session_id, we_id, set_id):
+    ws = get_object_or_404(
+        WorkoutSet, id=set_id,
+        workout_exercise__id=we_id,
+        workout_exercise__session__id=session_id,
+    )
+    try:
+        weight_kg = float(request.POST.get('weight_kg', ''))
+        reps = int(request.POST.get('reps', ''))
+        if weight_kg < 0 or reps < 1:
+            raise ValueError
+    except (ValueError, TypeError):
+        return redirect('gym_active_session', session_id=session_id)
+    ws.weight_kg = weight_kg
+    ws.reps = reps
+    ws.save()
+    url = reverse('gym_active_session', kwargs={'session_id': session_id})
+    return HttpResponseRedirect(f'{url}?timer={we_id}')
+
+
+@require_http_methods(['POST'])
+def remove_exercise(request, session_id, we_id):
+    we = get_object_or_404(WorkoutExercise, id=we_id, session__id=session_id, session__status='active')
+    we.delete()
+    return redirect('gym_active_session', session_id=session_id)
+
+
+@require_http_methods(['POST'])
 def finish_session(request, session_id):
     session = get_object_or_404(WorkoutSession, id=session_id, status='active')
     session.status = 'complete'

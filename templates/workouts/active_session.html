@@ -34,7 +34,14 @@
 
 {% for we in workout_exercises %}
 <div class="we-card" data-we-id="{{ we.id }}" data-rest="{{ we.planned_rest_seconds|default:'' }}" data-movement-type="{{ we.exercise.movement_type }}" data-exercise-name="{{ we.exercise.name }}">
-  <div class="we-name">{{ we.exercise.name }}</div>
+  <div class="we-name" style="display:flex;justify-content:space-between;align-items:center">
+    <span>{{ we.exercise.name }}</span>
+    <form method="post" action="{% url 'gym_remove_exercise' session.id we.id %}"
+          onsubmit="return confirm('Remove {{ we.exercise.name }} from this session?')">
+      {% csrf_token %}
+      <button type="submit" style="font-size:11px;padding:2px 8px;background:transparent;border:1px solid var(--border);border-radius:4px;color:var(--text-sec);cursor:pointer;line-height:1.6">Skip</button>
+    </form>
+  </div>
   <div class="we-meta">{{ we.exercise.get_category_display }} · {{ we.exercise.get_equipment_display }}</div>
 
   {% with rec=recommendations|get_item:we.exercise.id %}
@@ -68,17 +75,29 @@
     <span style="text-align:center">Reps</span><span></span><span></span>
   </div>
   {% for set in sets %}
-  <div class="set-row">
+  <div class="set-row" id="set-display-{{ set.id }}">
     <span class="set-num">{{ set.set_number }}</span>
     <span class="set-val">{{ set.weight_kg|floatformat:"-1" }}</span>
     <span class="set-x">×</span>
     <span class="set-val">{{ set.reps }}</span>
-    <span></span>
+    <button type="button" class="set-delete" onclick="openSetEdit({{ set.id }})" aria-label="Edit">✎</button>
     <form method="post" action="{% url 'gym_delete_set' session.id we.id set.id %}">
       {% csrf_token %}
       <button type="submit" class="set-delete" aria-label="Delete">×</button>
     </form>
   </div>
+  <form method="post" action="{% url 'gym_edit_set' session.id we.id set.id %}"
+        class="set-row" id="set-edit-{{ set.id }}" style="display:none">
+    {% csrf_token %}
+    <span class="set-num">{{ set.set_number }}</span>
+    <input type="number" name="weight_kg" class="set-input" step="0.5" min="0"
+           value="{{ set.weight_kg }}" inputmode="decimal" required>
+    <span class="set-x">×</span>
+    <input type="number" name="reps" class="set-input" min="1"
+           value="{{ set.reps }}" inputmode="numeric" required>
+    <button type="submit" class="set-check">✓</button>
+    <button type="button" class="set-delete" onclick="closeSetEdit({{ set.id }})">✕</button>
+  </form>
   {% endfor %}
   {% endif %}
 
@@ -236,6 +255,15 @@ function discardPreview() {
   document.getElementById('nl-error').style.display = 'none';
   document.getElementById('nl-quick-add').style.display = 'block';
 }
+
+function openSetEdit(setId) {
+  document.getElementById('set-display-' + setId).style.display = 'none';
+  document.getElementById('set-edit-' + setId).style.display = '';
+}
+function closeSetEdit(setId) {
+  document.getElementById('set-edit-' + setId).style.display = 'none';
+  document.getElementById('set-display-' + setId).style.display = '';
+}
 </script>
 
 <script>
@@ -287,6 +315,9 @@ document.querySelectorAll('.timer-preset-btn').forEach(function (btn) {
     startTimer(name, parseInt(btn.getAttribute('data-seconds'), 10));
   });
 });
+
+// Move overlay to body so position:fixed escapes overflow-y:auto container
+document.body.appendChild(document.getElementById('timer-overlay'));
 
 // Auto-start from ?timer=<we_id>
 (function () {
